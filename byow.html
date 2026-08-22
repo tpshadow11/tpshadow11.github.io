@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Build Your Own World — Troy</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <nav class="navbar">
+    <a href="index.html" class="nav-logo" aria-label="Home"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11.5 12 4l9 7.5" /><path d="M5.5 10v9a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-9" /><path d="M9.5 20v-6h5v6" /></svg></a>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="about.html">About</a></li>
+      <li><a href="projects.html" class="active">Projects</a></li>
+      <li><a href="contact.html">Contact</a></li>
+    </ul>
+  </nav>
+
+  <main>
+    <section class="hero hero--short">
+      <a href="projects.html" class="back-link">← Back to Projects</a>
+      <div class="hero-tag">CS61B · Data Structures</div>
+      <h1 class="hero-title">Build Your<br /><span class="accent">Own World.</span></h1>
+      <p class="hero-sub">A procedurally-generated 2D dungeon explorer written from scratch in Java — custom tile-rendering engine, seeded world generation, fog-of-war, and save/load persistence.</p>
+      <div class="project-meta">
+        <span class="tech-pill">Java</span>
+        <span class="tech-pill">Procedural Generation</span>
+        <span class="tech-pill">Custom Rendering Engine</span>
+        <span class="tech-pill">File I/O</span>
+      </div>
+      <div class="resource-row" style="margin-top:1.5rem;">
+        <a href="https://github.com/Berkeley-CS61B-Student/sp26-proj5-g20" target="_blank" class="btn btn-primary">Source on GitHub ↗</a>
+      </div>
+    </section>
+
+    <section class="section project-body">
+      <h2>Overview</h2>
+      <p>
+        BYOW is Project 5 of UC Berkeley's CS61B (Data Structures), built with a partner
+        (group g20). The goal: design and implement your own interactive world from the
+        ground up — no game engine, no rendering library beyond a bare-bones tile drawer.
+        Everything from the dungeon layout algorithm to the HUD to save/load persistence
+        is hand-written.
+      </p>
+      <p>
+        Every world is generated from a <strong>random seed</strong>: the same seed always
+        reproduces the exact same layout of rooms, hallways, and starting position, which
+        made the generation logic testable and let us debug specific "unlucky" seeds that
+        produced disconnected or degenerate maps.
+      </p>
+
+      <h2>What it does</h2>
+      <ul>
+        <li><strong>Procedural dungeon generation</strong> — a seeded RNG places a random number of rectangular rooms, then carves L-shaped hallways to connect every room into a single traversable graph.</li>
+        <li><strong>Real-time game loop</strong> — polls keyboard input every frame (WASD to move) and re-renders only what's changed, following the same input/update/render loop structure taught in the course's demo classes.</li>
+        <li><strong>Fog-of-war lighting</strong> — tiles outside a radius around the avatar (or not in line-of-sight) are hidden, toggled on/off with a keypress; see the two screenshots below of the same dungeon lit vs. dark.</li>
+        <li><strong>Save &amp; load</strong> — serializes the world's seed, avatar position, and state to disk so a session can be resumed later.</li>
+        <li><strong>English / Spanish HUD</strong> — the whole heads-up display can be toggled between languages on the fly.</li>
+      </ul>
+
+      <h2>Gameplay demo</h2>
+      <p>
+        A real recording of the game running — seed entry, world generation, moving
+        around with fog-of-war on, toggling full lighting, and the click-to-path
+        indicator tracing a route to a clicked tile.
+      </p>
+      <video class="demo-video" src="assets/video/byow-gameplay.mp4" poster="assets/images/byow/gameplay-poster.png" controls muted playsinline preload="metadata"></video>
+
+      <h2>Screenshots</h2>
+      <div class="shot-grid wide">
+        <figure class="shot">
+          <img src="assets/images/byow/main-menu.png" alt="BYOW title screen with New Game, Load Game, and Quit options" loading="lazy" />
+          <figcaption>Title screen — new game, load game, and a language toggle.</figcaption>
+        </figure>
+        <figure class="shot">
+          <img src="assets/images/byow/dungeon-lit.png" alt="Fully generated dungeon with rooms and hallways visible" loading="lazy" />
+          <figcaption>A fully generated world: rooms + hallways carved from a single seed.</figcaption>
+        </figure>
+        <figure class="shot">
+          <img src="assets/images/byow/dungeon-fog.png" alt="Same dungeon with fog-of-war limiting visibility around the avatar" loading="lazy" />
+          <figcaption>The same seed with fog-of-war on — only the area around the avatar is visible.</figcaption>
+        </figure>
+      </div>
+
+      <div class="note-box">
+        The repo lives under Berkeley's private <code>Berkeley-CS61B-Student</code> GitHub
+        org (course policy for academic-integrity reasons), so the link above will 404 for
+        anyone without course access — it's kept here as the canonical source location.
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p>Troy &mdash; UC Berkeley &rsquo;27</p>
+    <div class="footer-links">
+      <a href="https://github.com/" target="_blank">GitHub</a>
+      <a href="https://linkedin.com/" target="_blank">LinkedIn</a>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+</body>
+</html>

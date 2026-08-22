@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Treble Boost Effects Box — Troy</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <nav class="navbar">
+    <a href="index.html" class="nav-logo" aria-label="Home"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11.5 12 4l9 7.5" /><path d="M5.5 10v9a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-9" /><path d="M9.5 20v-6h5v6" /></svg></a>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="about.html">About</a></li>
+      <li><a href="projects.html" class="active">Projects</a></li>
+      <li><a href="contact.html">Contact</a></li>
+    </ul>
+  </nav>
+
+  <main>
+    <section class="hero hero--short">
+      <a href="projects.html" class="back-link">← Back to Projects</a>
+      <div class="hero-tag">EE 64 · Design Project</div>
+      <h1 class="hero-title">Treble Boost<br /><span class="accent">Effects Box.</span></h1>
+      <p class="hero-sub">An op-amp guitar pedal that boosts mid/treble frequencies to drive an amp into a biting, distorted tone — hand-designed, SPICE-simulated, breadboarded, and measured on the bench.</p>
+      <div class="project-meta">
+        <span class="tech-pill">LTSpice</span>
+        <span class="tech-pill">Op-Amp Design</span>
+        <span class="tech-pill">Active Filters</span>
+        <span class="tech-pill">Breadboard</span>
+      </div>
+      <div class="resource-row" style="margin-top:1.5rem;">
+        <a href="https://docs.google.com/presentation/d/1sROkN7bljlpMy4rYip3h1Oju1jRy8p8fsC3tnfP3ldA/edit?usp=sharing" target="_blank" class="btn btn-primary">Full Presentation ↗</a>
+        <a href="assets/circuits/treble-boost.asc" download class="btn btn-ghost">Download LTSpice Schematic (.asc)</a>
+      </div>
+    </section>
+
+    <section class="section project-body">
+      <div class="note-box">
+        Berkeley renumbered this course from EECS16B to <strong>EE 64</strong>. EECS16A is
+        being renumbered too (to <strong>EE 66</strong>) but hasn't changed yet at the time
+        of writing, so that project is still labeled under its old course number here.
+      </div>
+
+      <h2>Overview</h2>
+      <p>
+        This circuit sits between an electric guitar and its amplifier. It's a
+        non-inverting op-amp gain stage combined with a high-pass and low-pass filter,
+        so it works as a <strong>bandpass "treble boost"</strong>: it attenuates bass,
+        amplifies the 300&nbsp;Hz&ndash;15&nbsp;kHz range the guitar actually speaks in, and rolls
+        off very high frequencies to keep AM-radio interference out. Driving that
+        boosted signal into the amp's input pushes it into overdrive for a more
+        pleasant distorted tone, with a 10k gain-select pot for how hard it hits.
+      </p>
+
+      <h2>Symbolic transfer function</h2>
+      <div class="formula-block">
+        H(ω) ≈ A × HPF × LPF<br /><br />
+        A &nbsp;= 1 + (R2 + R4) / R1<br />
+        HPF = jωR5C3 / (1 + jωR5C3)<br />
+        LPF = 1 / (1 + jω(R2 + R4)C2)
+        <div class="muted-line" style="margin-top:0.75rem;">
+          R5 &amp; C3 set the low cutoff (bass rolloff) · R4 is the 10k gain-select pot ·
+          C2 sets the high cutoff (noise/AM rolloff) · C4/C5 (10µF) are DC-blocking coupling caps.
+        </div>
+      </div>
+
+      <h2>Schematic &amp; component values</h2>
+      <div class="shot-grid wide">
+        <figure class="shot">
+          <img src="assets/images/treble-boost/schematic.png" alt="LTSpice schematic of the treble boost op-amp circuit" loading="lazy" />
+          <figcaption>LTSpice schematic — non-inverting gain stage with HPF/LPF shaping and diode-protected supply rails.</figcaption>
+        </figure>
+      </div>
+
+      <h2>SPICE simulation</h2>
+      <div class="shot-grid wide">
+        <figure class="shot">
+          <img src="assets/images/treble-boost/spice-transient.png" alt="SPICE transient simulation at 1kHz showing gain above 10" loading="lazy" />
+          <figcaption>Transient response at 1 kHz (inside the treble-boost band) — output swings well above the input.</figcaption>
+        </figure>
+        <figure class="shot">
+          <img src="assets/images/treble-boost/spice-frequency.png" alt="SPICE AC analysis frequency response from 50Hz to 1MHz" loading="lazy" />
+          <figcaption>AC sweep, 50 Hz&ndash;1 MHz — bandpass shape peaking around 1&ndash;2 kHz.</figcaption>
+        </figure>
+      </div>
+
+      <h2>Breadboard build</h2>
+      <div class="shot-grid wide">
+        <figure class="shot">
+          <img src="assets/images/treble-boost/breadboard.png" alt="Top-view photo of the breadboarded circuit" loading="lazy" />
+          <figcaption>Breadboarded circuit — short wire runs and bypass caps to keep AM-radio interference out.</figcaption>
+        </figure>
+      </div>
+
+      <h2>Measured results</h2>
+      <div class="shot-grid wide">
+        <figure class="shot">
+          <img src="assets/images/treble-boost/scope-1khz.png" alt="Oscilloscope measurement at 1kHz showing Vo/Vi gain of 11" loading="lazy" />
+          <figcaption>Oscilloscope at 1 kHz — measured V<sub>o</sub>/V<sub>i</sub> ≈ 11.</figcaption>
+        </figure>
+        <figure class="shot">
+          <img src="assets/images/treble-boost/network-analyzer.png" alt="Network analyzer frequency response with peak gain of 22.4dB" loading="lazy" />
+          <figcaption>Network analyzer sweep — measured peak gain of 22.4 dB.</figcaption>
+        </figure>
+      </div>
+
+      <h2>Designed vs. simulated vs. measured</h2>
+      <div class="spec-table-wrap">
+        <table class="spec-table">
+          <thead>
+            <tr><th>Spec</th><th>Hand Calculation</th><th>SPICE Simulation</th><th>Measured</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Peak gain</td><td>21.6 dB</td><td>26.59 dB</td><td>22.366 dB</td></tr>
+            <tr><td>Lower cutoff f_L</td><td>338.6 Hz</td><td>184 Hz</td><td>170 Hz</td></tr>
+            <tr><td>Upper cutoff f_H</td><td>14.5 kHz</td><td>24.93 kHz</td><td>35 kHz</td></tr>
+            <tr><td>Gain at 100 Hz</td><td>&lt; 10</td><td>10.52</td><td>3</td></tr>
+            <tr><td>Gain at 1 kHz</td><td>≥ 10</td><td>21.09</td><td>11</td></tr>
+            <tr><td>Gain at 20 kHz</td><td>&lt; 10</td><td>16.51</td><td>7</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>
+        Differences between hand calculation, SPICE, and measurement are expected: the
+        hand calc uses simplified first-order filter math, while real components carry
+        tolerance error, and breadboard wiring adds parasitic loading the ideal model
+        doesn't capture.
+      </p>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p>Troy &mdash; UC Berkeley &rsquo;27</p>
+    <div class="footer-links">
+      <a href="https://github.com/" target="_blank">GitHub</a>
+      <a href="https://linkedin.com/" target="_blank">LinkedIn</a>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+</body>
+</html>
