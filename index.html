@@ -15,6 +15,7 @@
       <li><a href="index.html" class="active">Home</a></li>
       <li><a href="about.html">About</a></li>
       <li><a href="projects.html">Projects</a></li>
+      <li><a href="journals.html">Journals</a></li>
       <li><a href="contact.html">Contact</a></li>
     </ul>
   </nav>
@@ -24,18 +25,29 @@
       <div class="hero-text">
         <div class="hero-tag">Based in Berkeley, CA</div>
         <h1 class="hero-title">Troy<br /><span class="accent">Pham.</span></h1>
-        <p class="hero-sub">Electrical Engineering · Data Science · Software · Robotics</p>
+        <p class="hero-sub">AI &amp; Machine Learning · Robotics · Electrical Engineering · Data Science</p>
         <div class="hero-cta">
           <a href="projects.html" class="btn btn-primary">View Projects</a>
-          <a href="about.html" class="btn btn-ghost">About Me →</a>
+          <a href="journals.html" class="btn btn-ghost">Read Research Journals →</a>
         </div>
       </div>
-      <div class="hero-photo"><img src="assets/images/troy.png" alt="Troy Pham" /></div>
+      <div class="hero-photo"><img src="assets/images/troy.jpg" alt="Troy Pham" /></div>
     </section>
 
     <section class="section">
       <h2 class="section-label">Featured Work</h2>
       <div class="card-grid">
+
+        <a href="algoverse-vla-research.html" class="card">
+          <div class="card-tag ai">AI · Robotics Research</div>
+          <h3>Self-Correction for Robot Policies</h3>
+          <p>Algoverse AI research: a GPU evaluation harness for the 7B OpenVLA policy on LIBERO, used for matched-pair tests of whether language feedback helps a failed robot recover.</p>
+          <div class="card-footer">
+            <span class="tech-pill">PyTorch</span>
+            <span class="tech-pill">OpenVLA</span>
+            <span class="tech-pill">Modal GPUs</span>
+          </div>
+        </a>
 
         <a href="treble-boost.html" class="card">
           <div class="card-tag ee">Electrical Engineering</div>
@@ -48,7 +60,7 @@
         </a>
 
         <a href="byow.html" class="card">
-          <div class="card-tag sw">Software Eng</div>
+          <div class="card-tag sw">Software Engineering</div>
           <h3>Build Your Own World</h3>
           <p>A procedurally-generated 2D dungeon explorer written from scratch in Java for CS61B.</p>
           <div class="card-footer">
@@ -59,13 +71,42 @@
 
       </div>
     </section>
+    <section class="section">
+      <h2 class="section-label">Focus Areas</h2>
+      <div class="focus-grid">
+        <div class="focus-col ai">
+          <h3>AI &amp; Machine Learning</h3>
+          <ul>
+            <li><span class="kind">Research</span><a href="algoverse-vla-research.html">VLA self-correction</a>: LoRA fine-tuning a 7B model, LLM-generated diagnoses</li>
+            <li><span class="kind">Coursework</span>CS 188 Artificial Intelligence · DATA 100 · DATA 140</li>
+            <li><span class="kind">Tools</span>PyTorch · Hugging Face · scikit-learn · Modal</li>
+          </ul>
+        </div>
+        <div class="focus-col rb">
+          <h3>Robotics</h3>
+          <ul>
+            <li><span class="kind">Research</span><a href="algoverse-vla-research.html">Robot manipulation</a> in LIBERO / RoboSuite / MuJoCo simulation</li>
+            <li><span class="kind">Leadership</span><a href="about.html#experience">Underwater Robotics at Berkeley</a>: Internal VP, Electrical Team, building an autonomous underwater vehicle</li>
+            <li><span class="kind">Hackathon</span>Autonomous shopping robot, CalHacks</li>
+          </ul>
+        </div>
+        <div class="focus-col ee">
+          <h3>Electrical Engineering</h3>
+          <ul>
+            <li><span class="kind">Project</span><a href="treble-boost.html">Treble Boost Effects Box</a>: op-amp bandpass design, SPICE simulation, bench measurement</li>
+            <li><span class="kind">Club</span>AUV power, battery, and PCB schematics in KiCad</li>
+            <li><span class="kind">Coursework</span>EE 120 Signals &amp; Systems · EECS 16A/16B</li>
+          </ul>
+        </div>
+      </div>
+    </section>
   </main>
 
   <footer class="footer">
     <p>Troy &mdash; UC Berkeley &rsquo;27</p>
     <div class="footer-links">
-      <a href="https://github.com/" target="_blank">GitHub</a>
-      <a href="https://linkedin.com/" target="_blank">LinkedIn</a>
+      <a href="https://github.com/tpshadow11" target="_blank">GitHub</a>
+      <a href="https://linkedin.com/in/troy-pham-21b7ba323/" target="_blank">LinkedIn</a>
     </div>
   </footer>
 

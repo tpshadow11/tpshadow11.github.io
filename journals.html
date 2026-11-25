@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Journals — Troy</title>
+  <meta name="description" content="Research and engineering write-ups by Troy Pham across AI, machine learning, robotics, and electrical engineering." />
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <nav class="navbar">
+    <a href="index.html" class="nav-logo" aria-label="Home"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11.5 12 4l9 7.5" /><path d="M5.5 10v9a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-9" /><path d="M9.5 20v-6h5v6" /></svg></a>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="about.html">About</a></li>
+      <li><a href="projects.html">Projects</a></li>
+      <li><a href="journals.html" class="active">Journals</a></li>
+      <li><a href="contact.html">Contact</a></li>
+    </ul>
+  </nav>
+
+  <main>
+    <section class="hero hero--short">
+      <div class="hero-text">
+        <div class="hero-tag">Research &amp; Engineering Notes</div>
+        <h1 class="hero-title">Research<br /><span class="accent">Journals</span></h1>
+      </div>
+      <div class="hero-avatar"><img src="assets/images/troy.jpg" alt="Troy Pham" /></div>
+    </section>
+
+    <section class="section">
+      <div class="journal-intro">
+        <p class="lead">Longer write-ups of research and engineering work across AI, machine learning, robotics, and electrical engineering.</p>
+        <p>Each entry covers the question, the system I built to answer it, how it was measured, and what I took away from it.</p>
+      </div>
+
+      <h2 class="section-label">Research</h2>
+
+      <article class="journal-entry">
+        <div class="journal-when">
+          <strong>Summer 2026</strong>
+          Algoverse AI Research<br />AI Researcher
+        </div>
+        <div>
+          <div class="card-tag ai">AI · Robotics · ML</div>
+          <h3><a href="algoverse-vla-research.html">Language feedback for robot policies: evaluating self-correction in Vision-Language-Action models</a></h3>
+          <p>Built a GPU evaluation harness on Modal for the 7B-parameter OpenVLA robot policy on the LIBERO manipulation benchmark. It captures failed episodes, replays each one deterministically, and runs a matched-pair test of whether simulator-grounded language feedback helps the robot recover. I also benchmarked five VLA architectures and LoRA-fine-tuned OpenVLA on reflection data.</p>
+          <div class="card-footer">
+            <span class="tech-pill">PyTorch</span>
+            <span class="tech-pill">OpenVLA-7B</span>
+            <span class="tech-pill">LIBERO / MuJoCo</span>
+            <span class="tech-pill">Modal GPUs</span>
+            <span class="tech-pill">LoRA</span>
+            <a href="algoverse-vla-research.html" class="card-link">Read entry →</a>
+          </div>
+        </div>
+      </article>
+    </section>
+
+    <section class="section">
+      <h2 class="section-label">Engineering Build Logs</h2>
+
+      <article class="journal-entry">
+        <div class="journal-when">
+          <strong>2026</strong>
+          EE 64 · Design Project
+        </div>
+        <div>
+          <div class="card-tag ee">Electrical Engineering</div>
+          <h3><a href="treble-boost.html">Treble Boost Effects Box</a></h3>
+          <p>An op-amp bandpass circuit for guitar. I designed it by hand, simulated it in SPICE, built it on a breadboard, and measured it on the bench.</p>
+          <div class="card-footer">
+            <span class="tech-pill">LTSpice</span>
+            <span class="tech-pill">Op-Amp Design</span>
+            <a href="treble-boost.html" class="card-link">Read build log →</a>
+          </div>
+        </div>
+      </article>
+
+      <article class="journal-entry">
+        <div class="journal-when">
+          <strong>Spring 2026</strong>
+          CS 61B · Data Structures
+        </div>
+        <div>
+          <div class="card-tag sw">Software</div>
+          <h3><a href="byow.html">Build Your Own World</a></h3>
+          <p>A procedurally generated 2D world engine in Java, built on seeded generation, a real-time render loop, and save/load persistence.</p>
+          <div class="card-footer">
+            <span class="tech-pill">Java</span>
+            <span class="tech-pill">Procedural Generation</span>
+            <a href="byow.html" class="card-link">Read build log →</a>
+          </div>
+        </div>
+      </article>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p>Troy &mdash; UC Berkeley &rsquo;27</p>
+    <div class="footer-links">
+      <a href="https://github.com/tpshadow11" target="_blank">GitHub</a>
+      <a href="https://linkedin.com/in/troy-pham-21b7ba323/" target="_blank">LinkedIn</a>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+</body>
+</html>

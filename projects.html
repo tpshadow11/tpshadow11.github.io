@@ -15,6 +15,7 @@
       <li><a href="index.html">Home</a></li>
       <li><a href="about.html">About</a></li>
       <li><a href="projects.html" class="active">Projects</a></li>
+      <li><a href="journals.html">Journals</a></li>
       <li><a href="contact.html">Contact</a></li>
     </ul>
   </nav>
@@ -25,12 +26,13 @@
         <div class="hero-tag">My Work</div>
         <h1 class="hero-title">Recent<br /><span class="accent">Projects</span></h1>
       </div>
-      <div class="hero-avatar"><img src="assets/images/troy.png" alt="Troy Pham" /></div>
+      <div class="hero-avatar"><img src="assets/images/troy.jpg" alt="Troy Pham" /></div>
     </section>
 
     <section class="section">
       <div class="filter-bar">
         <button class="filter-btn active" data-filter="all">All</button>
+        <button class="filter-btn" data-filter="ai">AI / Robotics</button>
         <button class="filter-btn" data-filter="ee">Electrical Engineering</button>
         <button class="filter-btn" data-filter="ds">Data Science</button>
         <button class="filter-btn" data-filter="sw">Software</button>
@@ -38,6 +40,18 @@
       </div>
 
       <div class="card-grid" id="projectGrid">
+
+        <a href="algoverse-vla-research.html" class="card" data-cat="ai">
+          <div class="card-tag ai">AI · Robotics Research</div>
+          <h3>Self-Correction for Robot Policies</h3>
+          <p>Algoverse AI research on Vision-Language-Action models. A Modal GPU harness captures OpenVLA-7B failures on LIBERO and replays them deterministically for matched-pair tests. Also covers LoRA fine-tuning and a five-architecture benchmark.</p>
+          <div class="card-footer">
+            <span class="tech-pill">PyTorch</span>
+            <span class="tech-pill">OpenVLA-7B</span>
+            <span class="tech-pill">LoRA</span>
+            <span class="card-link">Read Journal →</span>
+          </div>
+        </a>
 
         <a href="treble-boost.html" class="card" data-cat="ee">
           <div class="card-tag ee">Electrical Engineering</div>
@@ -68,8 +82,8 @@
   <footer class="footer">
     <p>Troy &mdash; UC Berkeley &rsquo;27</p>
     <div class="footer-links">
-      <a href="https://github.com/" target="_blank">GitHub</a>
-      <a href="https://linkedin.com/" target="_blank">LinkedIn</a>
+      <a href="https://github.com/tpshadow11" target="_blank">GitHub</a>
+      <a href="https://linkedin.com/in/troy-pham-21b7ba323/" target="_blank">LinkedIn</a>
     </div>
   </footer>
 

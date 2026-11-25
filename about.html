@@ -15,6 +15,7 @@
       <li><a href="index.html">Home</a></li>
       <li><a href="about.html" class="active">About</a></li>
       <li><a href="projects.html">Projects</a></li>
+      <li><a href="journals.html">Journals</a></li>
       <li><a href="contact.html">Contact</a></li>
     </ul>
   </nav>
@@ -25,7 +26,7 @@
         <div class="hero-tag">Who I am</div>
         <h1 class="hero-title">About<br /><span class="accent">Me</span></h1>
       </div>
-      <div class="hero-avatar"><img src="assets/images/troy.png" alt="Troy Pham" /></div>
+      <div class="hero-avatar"><img src="assets/images/troy.jpg" alt="Troy Pham" /></div>
     </section>
 
     <section class="section about-grid">
@@ -68,6 +69,8 @@
             <span class="tech-pill">Matplotlib</span>
             <span class="tech-pill">scikit-learn</span>
             <span class="tech-pill">OpenVLA</span>
+            <span class="tech-pill">PyTorch</span>
+            <span class="tech-pill">LoRA Fine-Tuning</span>
           </div>
         </div>
       </div>
@@ -234,7 +237,7 @@
     </section>
 
     <section class="section">
-      <h2 class="section-label">Experience</h2>
+      <h2 class="section-label" id="experience">Experience</h2>
       <div class="exp-list">
 
         <div class="exp-item">
@@ -243,10 +246,11 @@
             <span class="exp-date">May 2026 – Aug 2026</span>
           </div>
           <ul>
-            <li>Researched "LLM Self-Correction in Vision-Language-Action Models via Simulation-Driven Optimization," applying preference optimization to robotic manipulation policies.</li>
-            <li>Built a RoboSuite/LIBERO simulation pipeline to evaluate the OpenVLA (openvla-7b) model on manipulation tasks, with GPT-4o-mini-driven error reflection prompting to correct action failures.</li>
-            <li>Ran automated preference-optimization fine-tuning experiments on Colab Pro (A100) and Modal.</li>
+            <li>Researched simulation-grounded self-correction for Vision-Language-Action (VLA) robot policies, testing whether natural-language failure diagnoses help a 7B OpenVLA policy recover on the LIBERO manipulation benchmark.</li>
+            <li>Built a Modal GPU evaluation harness that captures failed episodes and replays them deterministically for matched-pair experiments. Fixed a seeding bug that raised replay reproducibility from ~50% to 92%+.</li>
+            <li>Automated failure diagnosis with the Claude API, LoRA-fine-tuned OpenVLA-7B on synthetic reflection data, and benchmarked five VLA architectures (OpenVLA, CogACT, MemVLA, π0, G0.5).</li>
           </ul>
+          <a href="algoverse-vla-research.html" class="exp-more">Read the research journal →</a>
         </div>
 
         <div class="exp-item">
@@ -291,8 +295,8 @@
   <footer class="footer">
     <p>Troy &mdash; UC Berkeley &rsquo;27</p>
     <div class="footer-links">
-      <a href="https://github.com/" target="_blank">GitHub</a>
-      <a href="https://linkedin.com/" target="_blank">LinkedIn</a>
+      <a href="https://github.com/tpshadow11" target="_blank">GitHub</a>
+      <a href="https://linkedin.com/in/troy-pham-21b7ba323/" target="_blank">LinkedIn</a>
     </div>
   </footer>
 

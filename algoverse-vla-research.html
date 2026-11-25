@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VLA Self-Correction — Troy</title>
+  <meta name="description" content="Algoverse AI research: an evaluation harness for language-feedback self-correction in Vision-Language-Action robot policies (OpenVLA-7B on LIBERO)." />
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <nav class="navbar">
+    <a href="index.html" class="nav-logo" aria-label="Home"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11.5 12 4l9 7.5" /><path d="M5.5 10v9a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-9" /><path d="M9.5 20v-6h5v6" /></svg></a>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="about.html">About</a></li>
+      <li><a href="projects.html">Projects</a></li>
+      <li><a href="journals.html" class="active">Journals</a></li>
+      <li><a href="contact.html">Contact</a></li>
+    </ul>
+  </nav>
+
+  <main>
+    <section class="hero hero--short">
+      <div class="hero-text">
+        <a href="journals.html" class="back-link">← Back to Journals</a>
+        <div class="hero-tag">Algoverse AI Research · Summer 2026</div>
+        <h1 class="hero-title">Teaching Robots<br /><span class="accent">to Self-Correct.</span></h1>
+        <p class="hero-sub">Can a robot policy that has already failed be steered into recovering with natural-language feedback? I built the GPU evaluation infrastructure to test that question rigorously on a 7B-parameter Vision-Language-Action model.</p>
+        <div class="project-meta">
+          <span class="tech-pill">Python</span>
+          <span class="tech-pill">PyTorch</span>
+          <span class="tech-pill">OpenVLA-7B</span>
+          <span class="tech-pill">LIBERO</span>
+          <span class="tech-pill">RoboSuite / MuJoCo</span>
+          <span class="tech-pill">Modal (A10G · A100 · L40S)</span>
+          <span class="tech-pill">LoRA</span>
+          <span class="tech-pill">Hugging Face</span>
+          <span class="tech-pill">Claude API</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="section project-body">
+      <dl class="at-a-glance">
+        <div><dt>Role</dt><dd>AI Researcher, on a six-person team</dd></div>
+        <div><dt>Program</dt><dd>Algoverse AI Research</dd></div>
+        <div><dt>Timeline</dt><dd>May – Aug 2026</dd></div>
+        <div><dt>Domain</dt><dd>Robot learning · VLA models · LLM self-correction</dd></div>
+      </dl>
+
+      <div class="stat-row">
+        <div class="stat"><span class="stat-num">7B</span><span class="stat-label">parameter VLA policy evaluated on cloud GPUs</span></div>
+        <div class="stat"><span class="stat-num">5</span><span class="stat-label">VLA architectures benchmarked (OpenVLA, CogACT, MemVLA, π0, G0.5)</span></div>
+        <div class="stat"><span class="stat-num">100</span><span class="stat-label">matched episode pairs in the main controlled experiment</span></div>
+        <div class="stat"><span class="stat-num">92%+</span><span class="stat-label">failure-replay reproducibility after my seeding fix (up from ~50%)</span></div>
+        <div class="stat"><span class="stat-num">2.8k+</span><span class="stat-label">lines of pipeline code I wrote (fine-tuning, control eval, G0.5)</span></div>
+      </div>
+
+      <h2>The problem</h2>
+      <p>
+        Vision-Language-Action (VLA) models such as <strong>OpenVLA</strong> map a camera image and a
+        language instruction (<em>"pick up the black bowl and place it on the plate"</em>) directly to
+        robot-arm actions. They learn by <strong>behavior cloning</strong> from expert demonstrations,
+        which means they only ever see examples of success. Once deployed, a policy that drifts into
+        an unfamiliar state cannot notice its mistake or adapt.
+      </p>
+      <p>
+        In large language models, self-correction works best when the model gets
+        <strong>reliable external feedback</strong>. A physics simulator can supply exactly that: it
+        knows where the gripper ended up, where the object is, and whether contact happened. Our team
+        asked whether that simulator-grounded feedback, turned into a natural-language diagnosis and
+        fed back into the policy's prompt, could help a failed robot recover.
+      </p>
+
+      <h2>The system I helped build</h2>
+      <p>
+        A three-stage pipeline wrapped around OpenVLA's official LIBERO evaluation loop and run
+        serverlessly on Modal GPUs. The hooks are switched off by default, so with no flags set the
+        evaluation behaves exactly like stock OpenVLA.
+      </p>
+
+      <div class="diagram" role="img" aria-label="Pipeline: capture failed episodes, diagnose with grasp geometry and an LLM, replay the same scene under reflection and control arms, then compare matched pairs statistically.">
+        <svg viewBox="0 0 960 250" xmlns="http://www.w3.org/2000/svg" font-family="Space Mono, monospace">
+          <defs>
+            <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+              <path d="M0,0 L10,5 L0,10 z" fill="#4f5662" />
+            </marker>
+          </defs>
+          <!-- Stage 1 -->
+          <rect x="10" y="60" width="190" height="120" rx="6" fill="#ffffff" stroke="#1c2026" stroke-opacity="0.22" />
+          <rect x="10" y="60" width="190" height="4" fill="#6a3fb0" />
+          <text x="26" y="90" font-size="11" fill="#6a3fb0" letter-spacing="1.5">STAGE 1</text>
+          <text x="26" y="114" font-size="15" font-weight="700" fill="#1c2026" font-family="Syne, sans-serif">Capture</text>
+          <text x="26" y="138" font-size="11" fill="#4f5662">Run OpenVLA on LIBERO;</text>
+          <text x="26" y="154" font-size="11" fill="#4f5662">save state + MuJoCo</text>
+          <text x="26" y="170" font-size="11" fill="#4f5662">snapshot per failure</text>
+          <line x1="200" y1="120" x2="240" y2="120" stroke="#4f5662" stroke-width="1.5" marker-end="url(#arr)" />
+          <!-- Stage 2 -->
+          <rect x="245" y="60" width="190" height="120" rx="6" fill="#ffffff" stroke="#1c2026" stroke-opacity="0.22" />
+          <rect x="245" y="60" width="190" height="4" fill="#d23a1f" />
+          <text x="261" y="90" font-size="11" fill="#d23a1f" letter-spacing="1.5">STAGE 2</text>
+          <text x="261" y="114" font-size="15" font-weight="700" fill="#1c2026" font-family="Syne, sans-serif">Diagnose</text>
+          <text x="261" y="138" font-size="11" fill="#4f5662">Grasp geometry → LLM</text>
+          <text x="261" y="154" font-size="11" fill="#4f5662">writes a grounded,</text>
+          <text x="261" y="170" font-size="11" fill="#4f5662">one-line diagnosis</text>
+          <line x1="435" y1="120" x2="475" y2="120" stroke="#4f5662" stroke-width="1.5" marker-end="url(#arr)" />
+          <!-- Stage 3 -->
+          <rect x="480" y="20" width="220" height="200" rx="6" fill="#ffffff" stroke="#1c2026" stroke-opacity="0.22" />
+          <rect x="480" y="20" width="220" height="4" fill="#1f62b8" />
+          <text x="496" y="50" font-size="11" fill="#1f62b8" letter-spacing="1.5">STAGE 3</text>
+          <text x="496" y="74" font-size="15" font-weight="700" fill="#1c2026" font-family="Syne, sans-serif">Deterministic replay</text>
+          <text x="496" y="96" font-size="11" fill="#4f5662">Same task, init state, seed</text>
+          <rect x="496" y="110" width="188" height="44" rx="4" fill="#f3f1ec" stroke="#1c2026" stroke-opacity="0.10" />
+          <text x="508" y="129" font-size="11" font-weight="700" fill="#1c2026">C1 · Reflection</text>
+          <text x="508" y="145" font-size="10.5" fill="#4f5662">diagnosis in prompt</text>
+          <rect x="496" y="162" width="188" height="44" rx="4" fill="#f3f1ec" stroke="#1c2026" stroke-opacity="0.10" />
+          <text x="508" y="181" font-size="11" font-weight="700" fill="#1c2026">C2 · Control</text>
+          <text x="508" y="197" font-size="10.5" fill="#4f5662">same extra budget, no text</text>
+          <line x1="700" y1="120" x2="740" y2="120" stroke="#4f5662" stroke-width="1.5" marker-end="url(#arr)" />
+          <!-- Stage 4 -->
+          <rect x="745" y="60" width="205" height="120" rx="6" fill="#ffffff" stroke="#1c2026" stroke-opacity="0.22" />
+          <rect x="745" y="60" width="205" height="4" fill="#a86500" />
+          <text x="761" y="90" font-size="11" fill="#a86500" letter-spacing="1.5">ANALYSIS</text>
+          <text x="761" y="114" font-size="15" font-weight="700" fill="#1c2026" font-family="Syne, sans-serif">Matched pairs</text>
+          <text x="761" y="138" font-size="11" fill="#4f5662">McNemar exact test +</text>
+          <text x="761" y="154" font-size="11" fill="#4f5662">Clopper-Pearson bounds</text>
+          <text x="761" y="170" font-size="11" fill="#4f5662">on recovery effect</text>
+        </svg>
+      </div>
+      <p class="diagram-caption">Every failed episode is replayed twice from the same MuJoCo snapshot and RNG seed. The two runs differ only in the prompt, so any difference in outcome can be credited to the language feedback.</p>
+
+      <p>A diagnosis is grounded in the measured end-effector, gripper, and object positions rather than guessed. For example:</p>
+      <div class="prompt-block">In: <span class="hl">The previous attempt failed because the end-effector stalled ~0.27 m laterally from the bowl and never closed the gripper, so drive to the bowl's x,y first, then descend and close to grasp.</span> What action should the robot take to pick up the black bowl ...?<br />Out:</div>
+
+      <h2>What I built</h2>
+      <div class="contrib-grid">
+        <div class="contrib">
+          <div class="card-tag ai">ML Infrastructure</div>
+          <h4>LLM-driven failure diagnosis</h4>
+          <p>Replaced hand-typed diagnoses with an automated LLM call on every captured failure. Each call reads that failure's simulator state, so the diagnoses scale with the data instead of the team's time.</p>
+        </div>
+        <div class="contrib">
+          <div class="card-tag sw">Debugging</div>
+          <h4>Found &amp; fixed a replay-determinism bug</h4>
+          <p>The no-feedback baseline reproduced only 44–56% of the original failures, which made comparisons invalid. I traced the cause to unsynchronized NumPy and PyTorch RNG state between episodes and fixed it by reseeding both per episode. Replay became essentially exact: 0/5 divergences on a small batch, 3/33 on a larger one.</p>
+        </div>
+        <div class="contrib">
+          <div class="card-tag ai">Fine-Tuning</div>
+          <h4>LoRA fine-tuning pipeline</h4>
+          <p>Built a synthetic reflection dataset from the final 30–50% of successful LIBERO demonstrations, then LoRA-fine-tuned OpenVLA-7B on Modal (rank 32, 2,000 steps, mixed with the original demonstrations). This ruled out the possibility that the feedback prompt was simply unfamiliar to the model.</p>
+        </div>
+        <div class="contrib">
+          <div class="card-tag sw">Experiment Design</div>
+          <h4>Control arm &amp; prompt plumbing</h4>
+          <p>Implemented the control-condition evaluation, moved the feedback into a dedicated prompt-prefix slot (fixing a double-wrapped prompt), and tagged every run's condition in both the log filename and the log body, so paired trajectories can be audited.</p>
+        </div>
+        <div class="contrib">
+          <div class="card-tag ai">Robotics</div>
+          <h4>Second VLA integration (G0.5)</h4>
+          <p>Brought up Galaxea's G0.5 (2B parameters, Qwen backbone) on Modal with a batched WebSocket policy server and client, and its own LIBERO evaluation and reflection loop. Along the way I worked out checkpoint dependencies the upstream docs don't mention.</p>
+        </div>
+        <div class="contrib">
+          <div class="card-tag ee">Benchmarking</div>
+          <h4>Cross-architecture baselines</h4>
+          <p>Reproduced LIBERO baselines for five VLA families across four task suites. These set how much failure headroom each model leaves for recovery methods to work with.</p>
+        </div>
+      </div>
+
+      <h2>Harness validation: baseline benchmark</h2>
+      <p>Success rates from our harness before any feedback was added. Stronger models sit near the ceiling, which is why OpenVLA, with failure rates of 16–33%, became the main test subject for recovery.</p>
+      <div class="spec-table-wrap">
+        <table class="spec-table">
+          <thead><tr><th>Model</th><th>LIBERO suite</th><th class="num">Episodes</th><th class="num">Success</th></tr></thead>
+          <tbody>
+            <tr><td>OpenVLA-7B</td><td>Spatial</td><td class="num">50</td><td class="num">82%</td></tr>
+            <tr><td>OpenVLA-7B</td><td>Object</td><td class="num">31</td><td class="num">84%</td></tr>
+            <tr><td>OpenVLA-7B</td><td>Goal</td><td class="num">30</td><td class="num">83%</td></tr>
+            <tr><td>OpenVLA-7B</td><td>Long</td><td class="num">30</td><td class="num">67%</td></tr>
+            <tr><td>CogACT</td><td>Spatial</td><td class="num">20</td><td class="num">100%</td></tr>
+            <tr><td>CogACT</td><td>Goal</td><td class="num">20</td><td class="num">95%</td></tr>
+            <tr><td>MemVLA</td><td>Spatial</td><td class="num">20</td><td class="num">100%</td></tr>
+            <tr><td>π0</td><td>Spatial</td><td class="num">40</td><td class="num">85%</td></tr>
+            <tr><td>G0.5</td><td>Spatial</td><td class="num">50</td><td class="num">93%</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2>What we learned</h2>
+
+      <div class="finding">
+        <span class="finding-num">01</span>
+        <div>
+          <h4>Evaluation rigor is the foundation</h4>
+          <p>Before the seeding fix, nearly half of the "recoveries" were really replay noise. Once replays were deterministic, any recovery result could be trusted. The habit I took away: check that the measurement apparatus is sound before reading anything from it.</p>
+        </div>
+      </div>
+
+      <div class="finding">
+        <span class="finding-num">02</span>
+        <div>
+          <h4>The effect of test-time prompting is now tightly bounded</h4>
+          <p>Across 100 matched pairs, reflection and control produced the same outcome on every episode. That bounds the effect of prompt-based feedback to at most 3.0 percentage points on overall task success (95% confidence), which tells the field where effort should go next.</p>
+        </div>
+      </div>
+
+      <div class="finding">
+        <span class="finding-num">03</span>
+        <div>
+          <h4>Action fine-tuning reshapes a model's language ability</h4>
+          <p>Given identical frames and prompts, the base vision-language model writes a coherent failure diagnosis, but the action-fine-tuned checkpoint no longer can. This independently reproduces the catastrophic-forgetting effect reported by Hancock et al. (ICLR 2025) and lines up with the "linguistic blindness" observed by Zhang et al. (2026).</p>
+          <div class="quote-compare">
+            <div><span>Base VLM</span>Correctly explains that the robot missed the bowl because the gripper was misaligned.</div>
+            <div><span>After action fine-tuning</span>No coherent text, even with action tokens banned and a minimum length enforced.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="finding">
+        <span class="finding-num">04</span>
+        <div>
+          <h4>Correction belongs in training</h4>
+          <p>Together these point to building simulator-generated diagnoses into training, through preference optimization (APO/DPO-style) or attention recalibration, instead of adding them to the prompt at deployment time.</p>
+        </div>
+      </div>
+
+      <h2>Skills this built</h2>
+      <ul>
+        <li><strong>ML systems</strong>: containerized GPU workloads on Modal, model caching, detached long-running jobs, and a 14 GB checkpoint shared through volumes.</li>
+        <li><strong>Robot learning</strong>: VLA policy inference, the LIBERO / RoboSuite / MuJoCo simulation stack, and deterministic rollout replay.</li>
+        <li><strong>Model adaptation</strong>: LoRA fine-tuning of a 7B model, synthetic dataset construction, and checkpoint evaluation.</li>
+        <li><strong>Experimental statistics</strong>: matched-pair design, McNemar's exact test, Clopper-Pearson intervals, and power analysis.</li>
+        <li><strong>Research collaboration</strong>: shared codebase and Git workflow on a six-person team, literature review, and technical writing.</li>
+      </ul>
+
+      <div class="resource-row" style="margin-top:2rem;">
+        <a href="journals.html" class="btn btn-ghost">← All Journals</a>
+        <a href="contact.html" class="btn btn-primary">Talk to me about this work →</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p>Troy &mdash; UC Berkeley &rsquo;27</p>
+    <div class="footer-links">
+      <a href="https://github.com/tpshadow11" target="_blank">GitHub</a>
+      <a href="https://linkedin.com/in/troy-pham-21b7ba323/" target="_blank">LinkedIn</a>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+</body>
+</html>
