@@ -28,6 +28,7 @@
         <div class="hero-tag">CS61B | Data Structures</div>
         <h1 class="hero-title">Build Your<br /><span class="accent">Own World.</span></h1>
         <p class="hero-sub">A procedurally-generated 2D dungeon explorer written from scratch in Java — custom tile-rendering engine, seeded world generation, fog-of-war, and save/load persistence.</p>
+        <p class="headline-result"><b>Headline</b>Every world reproducible from a single seed &middot; fog-of-war, save/load, and an English/Spanish HUD, all hand-written in Java</p>
         <div class="project-meta">
           <span class="tech-pill">Java</span>
           <span class="tech-pill">Procedural Generation</span>
@@ -42,7 +43,7 @@
     </section>
 
     <section class="section project-body">
-      <h2>Overview</h2>
+      <h2>Problem</h2>
       <p>
         BYOW is Project 5 of UC Berkeley's CS61B (Data Structures), built with a partner
         (group g20). The goal: design and implement your own interactive world from the
@@ -57,7 +58,7 @@
         produced disconnected or degenerate maps.
       </p>
 
-      <h2>What it does</h2>
+      <h2>Approach</h2>
       <ul>
         <li><strong>Procedural dungeon generation</strong> — a seeded RNG places a random number of rectangular rooms, then carves L-shaped hallways to connect every room into a single traversable graph.</li>
         <li><strong>Real-time game loop</strong> — polls keyboard input every frame (WASD to move) and re-renders only what's changed, following the same input/update/render loop structure taught in the course's demo classes.</li>
@@ -66,7 +67,8 @@
         <li><strong>English / Spanish HUD</strong> — the whole heads-up display can be toggled between languages on the fly.</li>
       </ul>
 
-      <h2>Gameplay demo</h2>
+      <h2>Results</h2>
+      <h3 class="sub-h">Gameplay demo</h3>
       <p>
         A real recording of the game running — seed entry, world generation, moving
         around with fog-of-war on, toggling full lighting, and the click-to-path
@@ -74,7 +76,7 @@
       </p>
       <video class="demo-video" src="assets/video/byow-gameplay.mp4" poster="assets/images/byow/gameplay-poster.png" controls muted playsinline preload="metadata"></video>
 
-      <h2>Screenshots</h2>
+      <h3 class="sub-h">Screenshots</h3>
       <div class="shot-grid wide">
         <figure class="shot">
           <img src="assets/images/byow/main-menu.png" alt="BYOW title screen with New Game, Load Game, and Quit options" loading="lazy" />
@@ -89,6 +91,22 @@
           <figcaption>The same seed with fog-of-war on — only the area around the avatar is visible.</figcaption>
         </figure>
       </div>
+
+      <h2>What broke, and how we handled it</h2>
+
+      <div class="broke">
+        <h4>Some seeds generated broken maps</h4>
+        <dl>
+          <dt>Symptom</dt><dd>Certain "unlucky" seeds produced disconnected or degenerate dungeons, with rooms the player couldn't reach.</dd>
+          <dt>Approach</dt><dd>Because generation is fully seeded, a bad world is perfectly reproducible: we could re-run the exact seed, inspect the layout, change the generator, and confirm the same seed now produced a connected map.</dd>
+        </dl>
+      </div>
+
+      <h2>What I learned</h2>
+      <ul>
+        <li><strong>Determinism makes randomness testable.</strong> Seeding every random choice turned "sometimes the map is broken" into a bug we could reproduce on demand. I used the same idea later to make robot-simulation replays reliable in my <a href="algoverse-vla-research.html">Algoverse research</a>.</li>
+        <li><strong>Build the engine, then the features.</strong> Writing the input / update / render loop first made fog-of-war, the HUD, and save/load straightforward to add.</li>
+      </ul>
 
       <div class="note-box">
         The repo lives under Berkeley's private <code>Berkeley-CS61B-Student</code> GitHub

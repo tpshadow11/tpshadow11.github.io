@@ -29,6 +29,7 @@
         <div class="hero-tag">Algoverse AI Research | Summer 2026</div>
         <h1 class="hero-title">Teaching Robots<br /><span class="accent">to Self-Correct.</span></h1>
         <p class="hero-sub">Can a robot policy that has already failed be steered into recovering with natural-language feedback? I built the GPU evaluation infrastructure to test that question rigorously on a 7B-parameter Vision-Language-Action model.</p>
+        <p class="headline-result"><b>Headline</b>Replay reproducibility ~50% &rarr; 92%+ after my seeding fix &middot; 100 matched pairs &middot; 5 VLA architectures benchmarked</p>
         <div class="project-meta">
           <span class="tech-pill">Python</span>
           <span class="tech-pill">PyTorch</span>
@@ -59,7 +60,7 @@
         <div class="stat"><span class="stat-num">2.8k+</span><span class="stat-label">lines of pipeline code I wrote (fine-tuning, control eval, G0.5)</span></div>
       </div>
 
-      <h2>The problem</h2>
+      <h2>Problem</h2>
       <p>
         Vision-Language-Action (VLA) models such as <strong>OpenVLA</strong> map a camera image and a
         language instruction (<em>"pick up the black bowl and place it on the plate"</em>) directly to
@@ -75,7 +76,7 @@
         fed back into the policy's prompt, could help a failed robot recover.
       </p>
 
-      <h2>The system I helped build</h2>
+      <h2>Approach</h2>
       <p>
         A three-stage pipeline wrapped around OpenVLA's official LIBERO evaluation loop and run
         serverlessly on Modal GPUs. The hooks are switched off by default, so with no flags set the
@@ -83,7 +84,7 @@
       </p>
 
       <div class="diagram" role="img" aria-label="Pipeline: capture failed episodes, diagnose with grasp geometry and an LLM, replay the same scene under reflection and control arms, then compare matched pairs statistically.">
-        <svg viewBox="0 0 960 250" xmlns="http://www.w3.org/2000/svg" font-family="IBM Plex Mono, monospace">
+        <svg viewBox="0 0 960 250" xmlns="http://www.w3.org/2000/svg" font-family="Inter, sans-serif">
           <defs>
             <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
               <path d="M0,0 L10,5 L0,10 z" fill="#4f5662" />
@@ -135,17 +136,12 @@
       <p>A diagnosis is grounded in the measured end-effector, gripper, and object positions rather than guessed. For example:</p>
       <div class="prompt-block">In: <span class="hl">The previous attempt failed because the end-effector stalled ~0.27 m laterally from the bowl and never closed the gripper, so drive to the bowl's x,y first, then descend and close to grasp.</span> What action should the robot take to pick up the black bowl ...?<br />Out:</div>
 
-      <h2>What I built</h2>
+      <h3 class="sub-h">What I built</h3>
       <div class="contrib-grid">
         <div class="contrib">
           <div class="card-tag ai">ML Infrastructure</div>
           <h4>LLM-driven failure diagnosis</h4>
           <p>Replaced hand-typed diagnoses with an automated LLM call on every captured failure. Each call reads that failure's simulator state, so the diagnoses scale with the data instead of the team's time.</p>
-        </div>
-        <div class="contrib">
-          <div class="card-tag sw">Debugging</div>
-          <h4>Found &amp; fixed a replay-determinism bug</h4>
-          <p>The no-feedback baseline reproduced only 44–56% of the original failures, which made comparisons invalid. I traced the cause to unsynchronized NumPy and PyTorch RNG state between episodes and fixed it by reseeding both per episode. Replay became essentially exact: 0/5 divergences on a small batch, 3/33 on a larger one.</p>
         </div>
         <div class="contrib">
           <div class="card-tag ai">Fine-Tuning</div>
@@ -169,7 +165,9 @@
         </div>
       </div>
 
-      <h2>Harness validation: baseline benchmark</h2>
+      <h2>Results</h2>
+
+      <h3 class="sub-h">Baseline benchmark</h3>
       <p>Success rates from our harness before any feedback was added. Stronger models sit near the ceiling, which is why OpenVLA, with failure rates of 16–33%, became the main test subject for recovery.</p>
       <div class="spec-table-wrap">
         <table class="spec-table">
@@ -188,45 +186,60 @@
         </table>
       </div>
 
-      <h2>What we learned</h2>
+      <h3 class="sub-h">Controlled experiment</h3>
+      <p>Across 100 matched pairs, reflection and control produced the same outcome on every episode. That bounds the effect of prompt-based feedback to at most 3.0 percentage points on overall task success (95% confidence), which points future effort toward training-time methods.</p>
 
-      <div class="finding">
-        <span class="finding-num">01</span>
-        <div>
-          <h4>Evaluation rigor is the foundation</h4>
-          <p>Before the seeding fix, nearly half of the "recoveries" were really replay noise. Once replays were deterministic, any recovery result could be trusted. The habit I took away: check that the measurement apparatus is sound before reading anything from it.</p>
-        </div>
+      <h3 class="sub-h">Language-ability probe</h3>
+      <p>Given identical frames and prompts, the base vision-language model writes a coherent failure diagnosis, but the action-fine-tuned checkpoint no longer can. This independently reproduces the catastrophic-forgetting effect reported by Hancock et al. (ICLR 2025) and lines up with the "linguistic blindness" observed by Zhang et al. (2026).</p>
+      <div class="quote-compare" style="max-width:780px;margin-bottom:1.5rem;">
+        <div><span>Base VLM</span>Correctly explains that the robot missed the bowl because the gripper was misaligned.</div>
+        <div><span>After action fine-tuning</span>No coherent text, even with action tokens banned and a minimum length enforced.</div>
       </div>
 
-      <div class="finding">
-        <span class="finding-num">02</span>
-        <div>
-          <h4>The effect of test-time prompting is now tightly bounded</h4>
-          <p>Across 100 matched pairs, reflection and control produced the same outcome on every episode. That bounds the effect of prompt-based feedback to at most 3.0 percentage points on overall task success (95% confidence), which tells the field where effort should go next.</p>
-        </div>
+      <h2>What broke, and how I fixed it</h2>
+
+      <div class="broke">
+        <h4>Replays didn't reproduce the original failures</h4>
+        <dl>
+          <dt>Symptom</dt><dd>With no feedback at all, replaying a failed episode reproduced the failure only 44–56% of the time, so about half of any "recoveries" were noise.</dd>
+          <dt>Cause</dt><dd>LIBERO's <code>env.seed()</code> only reset NumPy's global random state. The replay loop skipped episodes, so each one consumed a different number of random draws than in the original run, and the policy's PyTorch random state was never reset at all.</dd>
+          <dt>Fix</dt><dd>Reseed NumPy <em>and</em> PyTorch with <code>set_seed_everywhere(episode_idx)</code> before every <code>env.reset()</code>. Divergences dropped to 0/5, then 3/33 on a larger batch; the remainder comes from non-deterministic GPU float accumulation.</dd>
+        </dl>
       </div>
 
-      <div class="finding">
-        <span class="finding-num">03</span>
-        <div>
-          <h4>Action fine-tuning reshapes a model's language ability</h4>
-          <p>Given identical frames and prompts, the base vision-language model writes a coherent failure diagnosis, but the action-fine-tuned checkpoint no longer can. This independently reproduces the catastrophic-forgetting effect reported by Hancock et al. (ICLR 2025) and lines up with the "linguistic blindness" observed by Zhang et al. (2026).</p>
-          <div class="quote-compare">
-            <div><span>Base VLM</span>Correctly explains that the robot missed the bowl because the gripper was misaligned.</div>
-            <div><span>After action fine-tuning</span>No coherent text, even with action tokens banned and a minimum length enforced.</div>
-          </div>
-        </div>
+      <div class="broke">
+        <h4>The feedback prompt was wrapped twice</h4>
+        <dl>
+          <dt>Symptom</dt><dd>Appending the feedback to the task prompt produced a malformed, doubly wrapped <code>In: … Out:</code> template, so the model never saw the prompt format it was trained on.</dd>
+          <dt>Fix</dt><dd>Gave the feedback its own prompt-prefix slot ahead of the task, and logged the exact prompt whenever feedback is active, so every run can be checked.</dd>
+        </dl>
       </div>
 
-      <div class="finding">
-        <span class="finding-num">04</span>
-        <div>
-          <h4>Correction belongs in training</h4>
-          <p>Together these point to building simulator-generated diagnoses into training, through preference optimization (APO/DPO-style) or attention recalibration, instead of adding them to the prompt at deployment time.</p>
-        </div>
+      <div class="broke">
+        <h4>Runs couldn't be told apart</h4>
+        <dl>
+          <dt>Symptom</dt><dd>Log files carried no condition labels, so there was no way to confirm which reflection run matched which control run.</dd>
+          <dt>Fix</dt><dd>Stamped each run's condition into both the log filename and the log body.</dd>
+        </dl>
       </div>
 
-      <h2>Skills this built</h2>
+      <div class="broke">
+        <h4>G0.5 wouldn't load</h4>
+        <dl>
+          <dt>Symptom</dt><dd>The G0.5 checkpoint failed to load on Modal.</dd>
+          <dt>Cause</dt><dd>It needs a Qwen processor folder and an action-tokenizer file at paths its documentation never mentions.</dd>
+          <dt>Fix</dt><dd>Traced the expected path through the checkpoint's <code>config.yaml</code> and documented the setup for the team.</dd>
+        </dl>
+      </div>
+
+      <h2>What I learned</h2>
+      <ul>
+        <li><strong>Check the measurement before the result.</strong> Before the seeding fix, half the apparent recoveries were replay noise. Now I validate the setup on a case with a known answer first.</li>
+        <li><strong>Rule out the easy explanation.</strong> Fine-tuning on the feedback prompt removed "the model has never seen this prompt" as an explanation, which made the result much more meaningful.</li>
+        <li><strong>Correction belongs in training.</strong> The results point to building simulator-generated diagnoses into training (APO/DPO-style preference optimization or attention recalibration) rather than adding them to the prompt at deployment.</li>
+      </ul>
+
+      <h3 class="sub-h">Skills this built</h3>
       <ul>
         <li><strong>ML systems</strong>: containerized GPU workloads on Modal, model caching, detached long-running jobs, and a 14 GB checkpoint shared through volumes.</li>
         <li><strong>Robot learning</strong>: VLA policy inference, the LIBERO / RoboSuite / MuJoCo simulation stack, and deterministic rollout replay.</li>
@@ -236,8 +249,8 @@
       </ul>
 
       <div class="resource-row" style="margin-top:2rem;">
-        <a href="journals.html" class="btn btn-ghost">← All Journals</a>
-        <a href="contact.html" class="btn btn-primary">Talk to me about this work →</a>
+        <a href="journals.html" class="btn btn-ghost">&larr; All Journals</a>
+        <a href="contact.html" class="btn btn-primary">Talk to me about this work &rarr;</a>
       </div>
     </section>
   </main>

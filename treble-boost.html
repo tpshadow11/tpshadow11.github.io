@@ -28,6 +28,7 @@
         <div class="hero-tag">EE 64 | Design Project</div>
         <h1 class="hero-title">Treble Boost<br /><span class="accent">Effects Box.</span></h1>
         <p class="hero-sub">An op-amp guitar pedal that boosts mid/treble frequencies to drive an amp into a biting, distorted tone — hand-designed, SPICE-simulated, breadboarded, and measured on the bench.</p>
+        <p class="headline-result"><b>Headline</b>Measured peak gain 22.4 dB &middot; &times;11 at 1 kHz on the bench &middot; hand calc, SPICE, and measurement compared side by side</p>
         <div class="project-meta">
           <span class="tech-pill">LTSpice</span>
           <span class="tech-pill">Op-Amp Design</span>
@@ -43,13 +44,8 @@
     </section>
 
     <section class="section project-body">
-      <div class="note-box">
-        Berkeley renumbered this course from EECS16B to <strong>EE 64</strong>. EECS16A is
-        being renumbered too (to <strong>EE 66</strong>) but hasn't changed yet at the time
-        of writing, so that project is still labeled under its old course number here.
-      </div>
 
-      <h2>Overview</h2>
+      <h2>Problem</h2>
       <p>
         This circuit sits between an electric guitar and its amplifier. It's a
         non-inverting op-amp gain stage combined with a high-pass and low-pass filter,
@@ -60,7 +56,8 @@
         pleasant distorted tone, with a 10k gain-select pot for how hard it hits.
       </p>
 
-      <h2>Symbolic transfer function</h2>
+      <h2>Approach</h2>
+      <h3 class="sub-h">Symbolic transfer function</h3>
       <div class="formula-block">
         H(ω) ≈ A × HPF × LPF<br /><br />
         A &nbsp;= 1 + (R2 + R4) / R1<br />
@@ -72,7 +69,7 @@
         </div>
       </div>
 
-      <h2>Schematic &amp; component values</h2>
+      <h3 class="sub-h">Schematic &amp; component values</h3>
       <div class="shot-grid wide">
         <figure class="shot">
           <img src="assets/images/treble-boost/schematic.png" alt="LTSpice schematic of the treble boost op-amp circuit" loading="lazy" />
@@ -80,7 +77,7 @@
         </figure>
       </div>
 
-      <h2>SPICE simulation</h2>
+      <h3 class="sub-h">SPICE simulation</h3>
       <div class="shot-grid wide">
         <figure class="shot">
           <img src="assets/images/treble-boost/spice-transient.png" alt="SPICE transient simulation at 1kHz showing gain above 10" loading="lazy" />
@@ -92,7 +89,7 @@
         </figure>
       </div>
 
-      <h2>Breadboard build</h2>
+      <h3 class="sub-h">Breadboard build</h3>
       <div class="shot-grid wide">
         <figure class="shot">
           <img src="assets/images/treble-boost/breadboard.png" alt="Top-view photo of the breadboarded circuit" loading="lazy" />
@@ -100,7 +97,8 @@
         </figure>
       </div>
 
-      <h2>Measured results</h2>
+      <h2>Results</h2>
+      <h3 class="sub-h">Bench measurements</h3>
       <div class="shot-grid wide">
         <figure class="shot">
           <img src="assets/images/treble-boost/scope-1khz.png" alt="Oscilloscope measurement at 1kHz showing Vo/Vi gain of 11" loading="lazy" />
@@ -112,7 +110,7 @@
         </figure>
       </div>
 
-      <h2>Designed vs. simulated vs. measured</h2>
+      <h3 class="sub-h">Designed vs. simulated vs. measured</h3>
       <div class="spec-table-wrap">
         <table class="spec-table">
           <thead>
@@ -128,12 +126,39 @@
           </tbody>
         </table>
       </div>
-      <p>
-        Differences between hand calculation, SPICE, and measurement are expected: the
-        hand calc uses simplified first-order filter math, while real components carry
-        tolerance error, and breadboard wiring adds parasitic loading the ideal model
-        doesn't capture.
-      </p>
+
+      <h2>What didn't match, and why</h2>
+
+      <div class="broke">
+        <h4>The upper cutoff landed far above the design</h4>
+        <dl>
+          <dt>Symptom</dt><dd>The hand calculation put the upper cutoff at 14.5 kHz; SPICE gave 24.9 kHz and the bench measured 35 kHz.</dd>
+          <dt>Cause</dt><dd>The hand calculation treats each filter as an isolated first-order stage, while the real circuit's stages load each other, and component tolerances shift the corner further.</dd>
+          <dt>Takeaway</dt><dd>The first-order model is good for choosing parts, not for predicting the corner. SPICE caught most of the gap before the build.</dd>
+        </dl>
+      </div>
+
+      <div class="broke">
+        <h4>Measured gain came in below simulation</h4>
+        <dl>
+          <dt>Symptom</dt><dd>At 1 kHz SPICE predicted a gain of 21; the oscilloscope measured 11. At 100 Hz, 10.5 simulated vs. 3 measured.</dd>
+          <dt>Cause</dt><dd>Real components carry tolerance error, and breadboard wiring adds parasitic loading that the ideal model doesn't capture.</dd>
+          <dt>Takeaway</dt><dd>The measured response still met the design goal: bass cut (gain 3 at 100 Hz), strong boost in the guitar's band (11 at 1 kHz, 22.4 dB peak), and roll-off above it.</dd>
+        </dl>
+      </div>
+
+      <h2>What I learned</h2>
+      <ul>
+        <li><strong>Compare three ways.</strong> Hand math, simulation, and bench measurement each catch different mistakes; putting them in one table made the gaps obvious.</li>
+        <li><strong>Simulate before you solder.</strong> SPICE flagged the cutoff shift before the breadboard did.</li>
+        <li><strong>Layout matters at audio frequencies too.</strong> Short wire runs and bypass capacitors kept AM-radio interference out of the build.</li>
+      </ul>
+
+      <div class="note-box">
+        Berkeley renumbered this course from EECS16B to <strong>EE 64</strong>. EECS16A is
+        being renumbered too (to <strong>EE 66</strong>) but hasn't changed yet at the time
+        of writing, so that project is still labeled under its old course number here.
+      </div>
     </section>
   </main>
 

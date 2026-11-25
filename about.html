@@ -30,7 +30,7 @@
       <div class="hero-photo"><img src="assets/images/troy.jpg" alt="Troy Pham" /></div>
     </section>
 
-    <section class="section about-grid">
+    <section class="section about-solo">
       <div class="about-text">
         <p class="lead">I’m a UC Berkeley undergraduate studying Applied Mathematics, Electrical Engineering and Computer Science, and Data Science. I’m especially interested in optimization and statistical modeling, and in how to test whether a model’s assumptions hold up in practice. I’m looking for early-career roles in robotics software and applied machine learning, especially work that involves building simulation and evaluation tools, debugging robot behavior, or integrating software with hardware. I’m also interested in solutions engineering roles where I can help teams deploy and troubleshoot robotics systems.</p>
         <p>I like figuring out why robots fail. At Algoverse AI, I studied whether a robot could use a short explanation of a failed attempt to recover on its next try. To test that fairly, I needed the simulator to reproduce the same failure each time. I traced inconsistent replays to how randomness was handled between runs and fixed the issue so we could compare recovery strategies under the same conditions.</p>
@@ -38,45 +38,43 @@
         <p>Outside of class, I enjoy photography, hiking, and playing guitar. I listen to US-UK pop, rock, V-pop, K-pop, and J-pop, and I recently started posting music covers on YouTube again.</p>
       </div>
 
-      <div class="skills-block">
-        <h2 class="block-label">Skills</h2>
-        <div class="skill-group">
-          <span class="skill-cat">Languages</span>
-          <div class="skill-pills">
-            <span class="tech-pill">Python</span>
-            <span class="tech-pill">Java</span>
-            <span class="tech-pill">MATLAB</span>
-            <span class="tech-pill">R</span>
-            <span class="tech-pill">C++</span>
-            <span class="tech-pill">SQL</span>
-            <span class="tech-pill">HTML/CSS/JS</span>
-            <span class="tech-pill">GitHub</span>
-          </div>
-        </div>
-        <div class="skill-group">
-          <span class="skill-cat">EE / Hardware</span>
-          <div class="skill-pills">
-            <span class="tech-pill">Circuit Analysis</span>
-            <span class="tech-pill">Signal Processing</span>
-            <span class="tech-pill">Control Systems</span>
-            <span class="tech-pill">KiCad</span>
-            <span class="tech-pill">LTSpice</span>
-          </div>
-        </div>
-        <div class="skill-group">
-          <span class="skill-cat">Data / ML</span>
-          <div class="skill-pills">
-            <span class="tech-pill">NumPy</span>
-            <span class="tech-pill">Pandas</span>
-            <span class="tech-pill">Matplotlib</span>
-            <span class="tech-pill">scikit-learn</span>
-            <span class="tech-pill">OpenVLA</span>
-            <span class="tech-pill">PyTorch</span>
-            <span class="tech-pill">LoRA Fine-Tuning</span>
-          </div>
-        </div>
-      </div>
     </section>
+
+    <section class="section" id="skills">
+      <h2 class="section-label">Skills</h2>
+      <table class="skills-table">
+        <thead><tr><th>Skill</th><th>Where I used it</th></tr></thead>
+        <tbody>
+          <tr class="grp"><th colspan="2">Robotics &amp; machine learning</th></tr>
+          <tr><td>VLA policy evaluation (OpenVLA-7B, LIBERO, MuJoCo)</td><td>GPU harness that captures failed episodes and replays them deterministically; 100 matched pairs: <a href="algoverse-vla-research.html">Algoverse research</a></td></tr>
+          <tr><td>LoRA fine-tuning (PyTorch, Hugging Face)</td><td>Fine-tuned OpenVLA-7B on synthetic reflection data, rank 32, 2,000 steps: <a href="algoverse-vla-research.html">Algoverse research</a></td></tr>
+          <tr><td>LLM APIs (Claude API)</td><td>Automated failure diagnosis from simulator state: <a href="algoverse-vla-research.html">Algoverse research</a></td></tr>
+          <tr><td>Cloud GPUs (Modal: A10G, A100, L40S)</td><td>Containerized evaluation and fine-tuning jobs with a shared 14 GB checkpoint cache: <a href="algoverse-vla-research.html">Algoverse research</a></td></tr>
+          <tr><td>Behavior trees</td><td>Control logic for an autonomous underwater vehicle: <a href="#experience">Underwater Robotics at Berkeley</a></td></tr>
+        </tbody>
+        <tbody>
+          <tr class="grp"><th colspan="2">Circuits &amp; hardware</th></tr>
+          <tr><td>Op-amp and active-filter design</td><td>Bandpass guitar boost, 22.4 dB measured peak gain: <a href="treble-boost.html">Treble Boost</a></td></tr>
+          <tr><td>Circuit simulation (LTspice)</td><td>Transient and AC sweeps compared against hand calculations and bench data: <a href="treble-boost.html">Treble Boost</a></td></tr>
+          <tr><td>Bench measurement (oscilloscope, network analyzer)</td><td>Gain and frequency response of a breadboarded circuit: <a href="treble-boost.html">Treble Boost</a></td></tr>
+          <tr><td>PCB schematics (KiCad)</td><td>Power-distribution and safety boards for the AUV: <a href="#experience">Underwater Robotics at Berkeley</a></td></tr>
+        </tbody>
+        <tbody>
+          <tr class="grp"><th colspan="2">Software</th></tr>
+          <tr><td>Python</td><td>Evaluation harness, diagnosis scripts, and fine-tuning pipelines: <a href="algoverse-vla-research.html">Algoverse research</a></td></tr>
+          <tr><td>Java and data structures</td><td>Seeded world generation, real-time game loop, save/load: <a href="byow.html">Build Your Own World</a></td></tr>
+          <tr><td>Git and GitHub</td><td>Shared codebase on a six-person research team: <a href="algoverse-vla-research.html">Algoverse research</a></td></tr>
+          <tr><td>HTML, CSS, JavaScript</td><td>This website</td></tr>
+        </tbody>
+        <tbody>
+          <tr class="grp"><th colspan="2">Data &amp; statistics</th></tr>
+          <tr><td>Experimental statistics (McNemar, Clopper-Pearson, power analysis)</td><td>Matched-pair analysis of feedback vs. control: <a href="algoverse-vla-research.html">Algoverse research</a></td></tr>
+          <tr><td>NumPy, Pandas, Matplotlib, scikit-learn</td><td>Coursework in DATA 100 and DATA 140</td></tr>
+          <tr><td>MATLAB, R, SQL, C++</td><td>Coursework</td></tr>
+        </tbody>
+      </table>
+    </section>
+
 
     <section class="section">
       <h2 class="section-label">My Story</h2>
