@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Residual Policy Learning — Troy</title>
+  <meta name="description" content="Independent robot-learning project: a frozen behavior-cloning backbone, failure-mode analysis, a bounded TD3+BC residual policy, and a data-derived safety shield on robomimic Lift." />
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;700&amp;family=Inter:wght@400..800&amp;display=swap" rel="stylesheet" />
+</head>
+<body>
+  <nav class="navbar">
+    <a href="index.html" class="nav-logo" aria-label="Home"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11.5 12 4l9 7.5" /><path d="M5.5 10v9a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-9" /><path d="M9.5 20v-6h5v6" /></svg></a>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="about.html">About</a></li>
+      <li><a href="projects.html">Projects</a></li>
+      <li><a href="journals.html" class="active">Journals</a></li>
+      <li><a href="resume.html">Resume</a></li>
+      <li><a href="contact.html">Contact</a></li>
+    </ul>
+  </nav>
+
+  <main>
+    <section class="hero hero--short">
+      <div class="hero-text">
+        <a href="journals.html" class="back-link">&larr; Back to Journals</a>
+        <div class="hero-tag">Independent Project | Fall 2026</div>
+        <h1 class="hero-title">Residual Policy<br /><span class="accent">Learning.</span></h1>
+        <p class="hero-sub">Can a small learned correction, bounded and safety-shielded, fix where a frozen robot policy fails? I trained a behavior-cloning backbone on a simulated grasp-and-lift task, traced exactly where and why it fails, and designed a bounded residual policy and safety shield around it.</p>
+        <p class="headline-result"><b>Headline</b>Frozen BC backbone at 73.3% success &middot; failures traced to the last ~3 cm of the approach &middot; residual + shield runs at 1.83 ms p99</p>
+        <div class="project-meta">
+          <span class="tech-pill">Python</span>
+          <span class="tech-pill">PyTorch</span>
+          <span class="tech-pill">robomimic</span>
+          <span class="tech-pill">robosuite / MuJoCo</span>
+          <span class="tech-pill">Offline RL (TD3+BC)</span>
+          <span class="tech-pill">Behavior Cloning</span>
+          <span class="tech-pill">Colab T4</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="section project-body">
+      <dl class="at-a-glance">
+        <div><dt>Role</dt><dd>Solo project</dd></div>
+        <div><dt>Type</dt><dd>Independent project</dd></div>
+        <div><dt>Timeline</dt><dd>Nov 2026</dd></div>
+        <div><dt>Domain</dt><dd>Robot learning | Offline RL | Safe control</dd></div>
+      </dl>
+
+      <div class="stat-row">
+        <div class="stat"><span class="stat-num">73.3%</span><span class="stat-label">BC backbone success (22/30 rollouts, fixed seed)</span></div>
+        <div class="stat"><span class="stat-num">200</span><span class="stat-label">human demonstrations (9,666 transitions) used for training</span></div>
+        <div class="stat"><span class="stat-num">99%</span><span class="stat-label">of BC gripper errors fall within ±5 steps of the grasp</span></div>
+        <div class="stat"><span class="stat-num">1.83 ms</span><span class="stat-label">p99 latency for residual + shield, far inside a 50 ms control period</span></div>
+        <div class="stat"><span class="stat-num">20.9k</span><span class="stat-label">parameters in the residual head, 29% the size of the backbone</span></div>
+      </div>
+
+      <h2>Problem</h2>
+      <p>
+        A common way to deploy learned robot policies is a <strong>frozen pretrained backbone</strong>
+        (for example a Vision-Language-Action model), a <strong>small residual policy</strong>
+        fine-tuned on task data to correct per-deployment errors, and a <strong>safety shield</strong>
+        that bounds whatever action actually reaches the robot.
+      </p>
+      <p>
+        I built a miniature version of that stack on robomimic's <em>Lift</em> task: a simulated
+        Panda arm has to grasp a cube and lift it. The backbone is a small behavior-cloning (BC)
+        network that I train and then freeze. The questions: where exactly does the backbone fail,
+        and can a correction that is only allowed to make <em>small</em> moves fix it, without ever
+        sending the robot an unsafe command?
+      </p>
+
+      <h3 class="sub-h">The task</h3>
+      <figure class="shot rollout-figure">
+        <video src="assets/video/robomimic-lift.mp4" poster="assets/images/residual/robomimic-lift-poster.png" autoplay loop muted playsinline controls preload="metadata" aria-label="Simulated robot arm reaching down, grasping a red cube, and lifting it"></video>
+        <figcaption>robomimic <em>Lift</em> in robosuite (MuJoCo): reach the cube, close the gripper on it, and lift it above a success height.</figcaption>
+      </figure>
+
+      <h2>Approach</h2>
+
+      <h3 class="sub-h">1. A frozen BC backbone</h3>
+      <p>
+        A 19&rarr;256&rarr;256&rarr;7 MLP with ReLU and a tanh output, so it can never emit actions
+        outside the controller's [&minus;1, 1] range, trained with MSE on normalized observations.
+        To pick the training budget I held out 10% of <strong>demonstrations</strong> (not
+        individual transitions, since consecutive transitions are near-duplicates and would leak).
+        Validation error bottomed out around epoch 8, and the later rise came almost entirely from
+        the gripper: longer training memorized each demo's gripper timing without improving the arm.
+        I fixed the budget at 15 epochs, trained on all 200 demos, then froze the network and
+        asserted it stayed frozen.
+      </p>
+
+      <h3 class="sub-h">2. Finding where BC fails</h3>
+      <p>
+        Offline, translation error is largest early in each demo, and gripper error is nearly zero
+        except in the grasp phase. The gripper sign disagrees with the demonstrator on only 2.14% of
+        steps, but 99% of those disagreements fall within &plusmn;5 steps of the demonstrator's own
+        close event. Gripper errors are timing errors at the grasp, not wrong decisions elsewhere.
+      </p>
+      <p>Online, I instrumented 30 rollouts and classified every failure:</p>
+      <div class="spec-table-wrap">
+        <table class="spec-table">
+          <thead><tr><th>Measure</th><th class="num">Successes (22)</th><th class="num">Failures (8)</th></tr></thead>
+          <tbody>
+            <tr><td>Closest gripper&ndash;cube distance</td><td class="num">1.2 cm</td><td class="num">2.9 cm</td></tr>
+            <tr><td>First gripper close (step)</td><td class="num">33.0</td><td class="num">48.5</td></tr>
+            <tr><td>Gripper open/close toggles</td><td class="num">1.0</td><td class="num">2.75</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>
+        Failed rollouts still get within about 3 cm of the cube (6 never quite reached it, 2 closed
+        but missed or slipped). So the failures aren't gross reaching errors. They're a
+        <strong>precision problem in the final approach</strong>: BC stalls a few centimeters off,
+        closes late, toggles the gripper, and loops. That is the classic compounding error of
+        imitation learning once the state drifts off the demonstrations. It sets the design goal for
+        the residual: small, translation-dominated corrections, conditioned on what BC is about to do.
+      </p>
+
+      <h3 class="sub-h">3. A bounded residual policy</h3>
+      <div class="formula-block">
+        a = clip( a<sub>BC</sub>(s) + &delta;, &minus;1, 1 )<br />
+        &delta; = bound &odot; tanh( f([ s, a<sub>BC</sub>(s) ]) )
+        <div class="muted-line" style="margin-top:0.75rem;">f is a 2&times;128 MLP whose last layer starts at zero, so training begins exactly at BC.</div>
+      </div>
+      <ul>
+        <li><strong>Conditioned on BC's action</strong>, so the head can learn "BC is about to undershoot here" directly instead of re-deriving BC's output from the state.</li>
+        <li><strong>Bounds from the data:</strong> each action dimension's bound is the 90th percentile of BC's own error on that dimension. A single fixed bound like 0.05 would be too small to fix translation errors yet larger than the demonstrators' entire spread on rotation. The gripper bound is deliberately too small to flip open/close on its own; it can only nudge timing.</li>
+        <li><strong>TD3+BC</strong> (twin critics, delayed actor, a behavior-cloning term) keeps the correction on the support of the expert data, which matters when every demonstration is expert.</li>
+        <li><strong>No reward shaping.</strong> A distance-to-cube bonus isn't potential-based, so it changes the optimal policy and rewards hovering near the cube, which is exactly BC's failure mode.</li>
+        <li><strong>Clipped target actions:</strong> the critic's target uses the action the robot would <em>actually execute</em>, so it never bootstraps from impossible actions the actor could exploit.</li>
+        <li><strong>Training:</strong> soft target updates (&tau; = 0.005), 5,000 steps at batch 256. Critic loss fell from 0.21 to about 3&times;10<sup>&minus;4</sup> and both losses were flat after about 3,000 steps.</li>
+      </ul>
+
+      <h3 class="sub-h">4. A safety shield</h3>
+      <p>
+        The last line of defense clips each action dimension to the range the demonstrators used,
+        widened by exactly that dimension's residual bound (the largest legitimate correction),
+        replaces NaN/Inf with a no-op, and counts clips per dimension. I used per-dimension bounds
+        instead of one L2 ball because the dimensions have very different units (translation,
+        rotation, and a binary gripper), and per-axis limits map directly onto real hardware limits.
+      </p>
+
+      <h2>Results</h2>
+      <div class="spec-table-wrap">
+        <table class="spec-table">
+          <thead><tr><th>Metric</th><th class="num">BC backbone</th><th class="num">BC + residual + shield</th></tr></thead>
+          <tbody>
+            <tr><td>Success (30 rollouts, seed 42)</td><td class="num">73.3% (22/30)</td><td class="num">Re-run pending (see below)</td></tr>
+            <tr><td>Mean steps on success</td><td class="num">50.6</td><td class="num">&mdash;</td></tr>
+            <tr><td>p99 policy latency</td><td class="num">0.90 ms</td><td class="num">1.83 ms</td></tr>
+            <tr><td>Parameters</td><td class="num">72,711</td><td class="num">93,582 (72,711 frozen + 20,871 residual)</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>
+        Both policies run far inside a 50 ms control period at 20 Hz, and the residual head adds only
+        29% to the model size. Every policy is evaluated on the same 30 seeded starting states, so
+        results are directly comparable.
+      </p>
+
+      <h2>What broke, and how I'm fixing it</h2>
+
+      <div class="broke">
+        <h4>The install step failed silently</h4>
+        <dl>
+          <dt>Symptom</dt><dd>The environment setup printed "Installed." even though a dependency had failed to build.</dd>
+          <dt>Cause</dt><dd>robomimic's <code>egl_probe</code> dependency doesn't build on current Colab, and pip installs all-or-nothing, so robomimic was never installed.</dd>
+          <dt>Fix</dt><dd>Installed robosuite and MuJoCo normally and robomimic with <code>--no-deps</code>; <code>egl_probe</code> is only needed by a wrapper this project never calls.</dd>
+        </dl>
+      </div>
+
+      <div class="broke">
+        <h4>Two training diagnostics were stuck at zero</h4>
+        <dl>
+          <dt>Symptom</dt><dd>The Q-value and residual-magnitude logs read 0.0 for the whole run, while the losses moved normally.</dd>
+          <dt>Cause</dt><dd>Those two prints were still placeholders, so the run never recorded the two signals that would confirm the critic is honest and the residual stays small.</dd>
+          <dt>Fix</dt><dd>Two lines: log <code>min(Q1, Q2).mean()</code> and the mean |&delta;| each print.</dd>
+        </dl>
+      </div>
+
+      <div class="broke">
+        <h4>The shield blocked the gripper from closing</h4>
+        <dl>
+          <dt>Symptom</dt><dd>With the shield on, the first full evaluation scored 0/30, even though the residual is bounded to small corrections and trained normally.</dd>
+          <dt>Cause</dt><dd>The shield's upper bound was computed from the demonstrations' <em>minimum</em> instead of their maximum, squeezing every action into a thin band near the bottom of its range. On the gripper that caps the command near fully open, so the robot can never grasp.</dd>
+          <dt>Fix</dt><dd>One line: build the upper bound from the demo maximum. The corrected evaluation is the next run.</dd>
+        </dl>
+      </div>
+
+      <h2>What I learned</h2>
+      <ul>
+        <li><strong>Diagnose before you design.</strong> Classifying every failure showed the problem was the last 3 cm of approach and the grasp timing, which shaped every residual decision.</li>
+        <li><strong>Derive limits from the data.</strong> Per-dimension bounds from BC's actual errors and the demonstrators' actual range beat any single hand-picked number.</li>
+        <li><strong>Question your tools.</strong> A setup step reporting success, logs reading zero, and a safety layer that silently blocks the task are all failures that look like results. Each needed a check against a known answer.</li>
+      </ul>
+
+      <h3 class="sub-h">What I'd do next</h3>
+      <ul>
+        <li>Re-run the evaluation with the corrected shield and live Q / residual-magnitude diagnostics, and check Q against Monte-Carlo returns.</li>
+        <li>Ablate the design: TD3+BC vs. pure distillation, and clipped vs. unclipped target actions.</li>
+        <li>Target the gripper directly with a classification head or a gripper-specific residual.</li>
+        <li>Evaluate on 100+ rollouts: at 30, one rollout is 3.3 points and the binomial standard error is about 8 points.</li>
+      </ul>
+
+      <h3 class="sub-h">Skills this built</h3>
+      <ul>
+        <li><strong>Robot learning</strong>: behavior cloning, failure-mode instrumentation, and residual policies on robomimic / robosuite.</li>
+        <li><strong>Offline reinforcement learning</strong>: TD3+BC with twin critics, target smoothing, and soft target updates.</li>
+        <li><strong>Safe control</strong>: data-derived action bounds, per-dimension safety shields, and latency budgeting.</li>
+        <li><strong>Experimental hygiene</strong>: demo-level validation splits, fixed seeds, and matched evaluation starts.</li>
+      </ul>
+
+      <div class="resource-row" style="margin-top:2rem;">
+        <a href="journals.html" class="btn btn-ghost">&larr; All Journals</a>
+        <a href="contact.html" class="btn btn-primary">Talk to me about this work &rarr;</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p>Troy &mdash; UC Berkeley &rsquo;27</p>
+    <div class="footer-links">
+      <a href="mailto:troyluanpham@gmail.com" class="social-icon social-icon--sm" aria-label="Email" title="Email"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></a>
+      <a href="https://www.linkedin.com/in/troy-pham" target="_blank" rel="noopener" class="social-icon social-icon--sm" aria-label="LinkedIn" title="LinkedIn"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg></a>
+      <a href="https://github.com/tpshadow11" target="_blank" rel="noopener" class="social-icon social-icon--sm" aria-label="GitHub" title="GitHub"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg></a>
+      <a href="https://www.youtube.com/@troyphammusic" target="_blank" rel="noopener" class="social-icon social-icon--sm" aria-label="YouTube" title="YouTube"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z"/><polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"/></svg></a>
+      <a href="https://www.instagram.com/troypham2005/" target="_blank" rel="noopener" class="social-icon social-icon--sm" aria-label="Instagram" title="Instagram"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg></a>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+</body>
+</html>
