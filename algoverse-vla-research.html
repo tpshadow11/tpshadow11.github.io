@@ -76,6 +76,12 @@
         fed back into the policy's prompt, could help a failed robot recover.
       </p>
 
+      <h3 class="sub-h">What an episode looks like</h3>
+      <figure class="shot rollout-figure">
+        <video src="assets/video/libero-goal-wine-bottle.mp4" poster="assets/images/algoverse/libero-goal-wine-bottle-poster.png" autoplay loop muted playsinline controls preload="metadata" aria-label="Simulated robot arm picking up a wine bottle and placing it on a rack"></video>
+        <figcaption>OpenVLA-7B in our harness on the LIBERO-Goal task <em>"put the wine bottle on the rack"</em> (episode 10, success). The policy sees only this camera view and the instruction, and outputs arm actions step by step.</figcaption>
+      </figure>
+
       <h2>Approach</h2>
       <p>
         A three-stage pipeline wrapped around OpenVLA's official LIBERO evaluation loop and run

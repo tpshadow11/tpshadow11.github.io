@@ -1072,6 +1072,10 @@ a.course-card:hover { border-color: var(--accent); transform: translateY(-2px); 
 
 .about-solo .about-text { max-width: 760px; }
 
+/* Short simulation clip on the research page (source video is 224x224) */
+.rollout-figure { max-width: 420px; margin-bottom: 1.5rem; }
+.rollout-figure video { display: block; width: 100%; aspect-ratio: 1 / 1; background: #000; border-bottom: 1px solid var(--border); }
+
 /* ── Footer ───────────────────────────────────────────────────── */
 .footer {
   display: flex;
