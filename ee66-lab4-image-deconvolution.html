@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EE 66 Lab 4: Image Deconvolution — Troy</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;700&amp;family=Inter:wght@400..800&amp;display=swap" rel="stylesheet" />
+</head>
+<body>
+  <nav class="navbar">
+    <a href="index.html" class="nav-logo" aria-label="Home"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11.5 12 4l9 7.5" /><path d="M5.5 10v9a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-9" /><path d="M9.5 20v-6h5v6" /></svg></a>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="about.html">About</a></li>
+      <li><a href="projects.html" class="active">Projects</a></li>
+      <li><a href="journals.html">Journals</a></li>
+      <li><a href="resume.html">Resume</a></li>
+      <li><a href="contact.html">Contact</a></li>
+    </ul>
+  </nav>
+
+  <main>
+    <section class="hero hero--short">
+      <div class="hero-text">
+        <a href="ee66-labs.html" class="back-link">&larr; Back to EE 66 Labs</a>
+        <div class="hero-tag">EE 66 | Lab 4 | Fall 2026</div>
+        <h1 class="hero-title">Undoing<br /><span class="accent">Motion Blur.</span></h1>
+        <p class="hero-sub">Motion blur modeled as convolution with a point-spread function. The direct inverse amplifies noise into static, while Fourier-domain Tikhonov regularization recovers the image; a no-reference score also identifies the unknown blur direction.</p>
+        <p class="headline-result"><b>Headline</b>PSNR 20.7 &rarr; 23.3&nbsp;dB with Tikhonov regularization &middot; direct inverse collapses to 4.8&nbsp;dB &middot; true blur angle found without the original</p>
+        <div class="project-meta">
+          <span class="tech-pill">Python</span>
+          <span class="tech-pill">NumPy</span>
+          <span class="tech-pill">2D FFT</span>
+          <span class="tech-pill">Tikhonov Regularization</span>
+          <span class="tech-pill">Inverse Problems</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="section project-body">
+      <dl class="at-a-glance">
+        <div><dt>Course</dt><dd>EE 66, Signals, Dynamics &amp; Information</dd></div>
+        <div><dt>Lab</dt><dd>Lab 4: Image Deconvolution</dd></div>
+        <div><dt>Timeline</dt><dd>Week 10, Fall 2026</dd></div>
+        <div><dt>Topics</dt><dd>2D convolution, Fourier domain, regularization</dd></div>
+      </dl>
+
+      <div class="stat-row"><div class="stat"><span class="stat-num">23.3 dB</span><span class="stat-label">PSNR after regularized deblurring (from 20.7 dB)</span></div><div class="stat"><span class="stat-num">4.8 dB</span><span class="stat-label">PSNR of the direct inverse: pure amplified noise</span></div><div class="stat"><span class="stat-num">~10<sup>6</sup></span><span class="stat-label">noise amplification at the weakest frequencies</span></div><div class="stat"><span class="stat-num">12&deg;</span><span class="stat-label">blur angle recovered without the original image</span></div></div>
+
+      <h2>Overview</h2>
+      <p>Undoing motion blur in a photo. A camera shake is modeled as a convolution of the sharp image with a point-spread function (PSF), plus sensor noise. The goal is to recover the sharp image from the blurry one, and to see why the obvious inverse fails badly while a regularized one works.</p>
+
+      <h2>Approach</h2>
+      <ul>
+          <li><strong>Blur is a linear system.</strong> Convolution with the PSF is a matrix H acting on the flattened image, so blurring is y = Hx + noise. The singular values of H show what blur preserves and what it nearly erases.</li>
+          <li><strong>Work in the frequency domain.</strong> The 2D FFT turns convolution into multiplication at each spatial frequency, Y = H&middot;X + N, so each frequency can be handled separately.</li>
+          <li><strong>Try the direct inverse.</strong> Dividing by H undoes the blur exactly in a noiseless world. Here |H| drops to about 10<sup>&minus;6</sup> at some frequencies, so the small amount of noise at those frequencies gets amplified roughly a million times.</li>
+          <li><strong>Regularize instead.</strong> Tikhonov (ridge) regularization adds &lambda; to the denominator, trading a little sharpness for stability. I swept &lambda; over five orders of magnitude and picked the value with the lowest error.</li>
+          <li><strong>Handle an unknown blur.</strong> When the true blur direction isn't known, try several candidate PSFs and score each reconstruction without the original image: how well it reproduces the measurement, plus a penalty for roughness.</li>
+        </ul>
+        <div class="formula-block">
+          Model: &nbsp;y = Hx + n &nbsp;&nbsp;&harr;&nbsp;&nbsp; Y[k,&#8467;] = H[k,&#8467;]&thinsp;X[k,&#8467;] + N[k,&#8467;]<br />
+          Tikhonov: &nbsp;x&#770; = argmin &Vert;Hx &minus; y&Vert;&sup2; + &lambda;&Vert;x&Vert;&sup2; &nbsp;&nbsp;&rarr;&nbsp;&nbsp; X&#770;[k,&#8467;] = H&#773;[k,&#8467;] &middot; Y[k,&#8467;] / (|H[k,&#8467;]|&sup2; + &lambda;)
+          <div class="muted-line" style="margin-top:0.75rem;">The direct inverse is the &lambda; = 0 case, Y/H. With &lambda; &gt; 0 the denominator never drops below &lambda;, so frequencies the blur nearly erased can't blow up.</div>
+        </div>
+
+      <h2>Results</h2>
+      <div class="spec-table-wrap">
+          <table class="spec-table">
+            <thead>
+              <tr><th>Image</th><th>PSNR vs. original</th><th>Relative error</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Blurred, noisy measurement</td><td>20.7 dB</td><td>15.9%</td></tr>
+              <tr><td>Direct inverse filter</td><td>4.8 dB</td><td>&mdash; (pure noise)</td></tr>
+              <tr><td>Tikhonov, best &lambda; &asymp; 7.7&times;10<sup>&minus;3</sup></td><td>23.3 dB</td><td>11.7%</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>With the blur direction unknown, the no-reference scoring rule picked the correct angle (12&deg;) out of five candidates without ever seeing the original image.</p>
+        <div class="shot-grid" style="grid-template-columns:1fr;">
+          <figure class="shot">
+            <img src="assets/images/ee66/lab4/deblur.jpg" alt="Four panels: the original cameraman photo, a motion-blurred noisy version, a direct inverse result that is pure noise, and a Tikhonov reconstruction that recovers the person and tripod" loading="lazy" />
+            <figcaption>The 19-pixel motion blur at 12&deg;. The direct inverse turns the image into amplified noise, while Tikhonov regularization recovers the person, the camera, and the tripod legs.</figcaption>
+          </figure>
+        </div>
+        <div class="shot-grid" style="grid-template-columns:minmax(0, 520px);">
+          <figure class="shot">
+            <img src="assets/images/ee66/lab4/lambda-sweep.png" alt="Relative error versus regularization strength on a log axis, falling from 0.81 to a minimum of about 0.12 near lambda 0.008, then rising" loading="lazy" />
+            <figcaption>The &lambda; sweep. Too little regularization lets noise through, too much smooths away detail, and the best value (red) sits in between.</figcaption>
+          </figure>
+        </div>
+
+      <h2>What I learned</h2>
+      <ul>
+          <li><strong>Inverse problems can be ill-posed even when the math is exact.</strong> The direct inverse is the correct formula, and still the worst result here, because it divides by numbers near zero.</li>
+          <li><strong>Regularization is a deliberate trade-off.</strong> One parameter, &lambda;, decides how much to trust the data versus how much to prefer a stable answer. The error curve has a clear sweet spot between the two failure modes.</li>
+          <li><strong>The frequency domain makes a huge problem small.</strong> The image-sized matrix problem becomes one division per frequency, solved with two FFTs.</li>
+          <li><strong>You can pick a model without the answer key.</strong> Checking whether a reconstruction re-blurs into the measurement, and penalizing noise, was enough to find the true blur direction.</li>
+        </ul>
+
+      <div class="note-box">
+        Lab starter materials are from the <a href="https://eecs66.org/" target="_blank" rel="noopener">EE 66 course staff</a>. The implementation and write-up are my own; the notebook code is kept private in line with course academic-integrity policy.
+      </div>
+
+      <nav class="lab-pager"><a href="ee66-lab3-voice-recognition.html">&larr; Lab 3: Voice Recognition</a><a href="ee66-lab5-medical-imaging.html">Lab 5: Medical Imaging &rarr;</a></nav>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p>Troy &mdash; UC Berkeley &rsquo;27</p>
+    <div class="footer-links">
+      <a href="mailto:troyluanpham@gmail.com" class="social-icon social-icon--sm" aria-label="Email" title="Email"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></a>
+      <a href="https://www.linkedin.com/in/troy-pham" target="_blank" rel="noopener" class="social-icon social-icon--sm" aria-label="LinkedIn" title="LinkedIn"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg></a>
+      <a href="https://github.com/tpshadow11" target="_blank" rel="noopener" class="social-icon social-icon--sm" aria-label="GitHub" title="GitHub"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg></a>
+      <a href="https://www.youtube.com/@troyphammusic" target="_blank" rel="noopener" class="social-icon social-icon--sm" aria-label="YouTube" title="YouTube"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z"/><polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"/></svg></a>
+      <a href="https://www.instagram.com/troypham2005/" target="_blank" rel="noopener" class="social-icon social-icon--sm" aria-label="Instagram" title="Instagram"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg></a>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+</body>
+</html>

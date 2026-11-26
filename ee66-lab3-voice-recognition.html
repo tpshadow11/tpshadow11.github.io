@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EE 66 Lab 3: Voice Recognition — Troy</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;700&amp;family=Inter:wght@400..800&amp;display=swap" rel="stylesheet" />
+</head>
+<body>
+  <nav class="navbar">
+    <a href="index.html" class="nav-logo" aria-label="Home"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11.5 12 4l9 7.5" /><path d="M5.5 10v9a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-9" /><path d="M9.5 20v-6h5v6" /></svg></a>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="about.html">About</a></li>
+      <li><a href="projects.html" class="active">Projects</a></li>
+      <li><a href="journals.html">Journals</a></li>
+      <li><a href="resume.html">Resume</a></li>
+      <li><a href="contact.html">Contact</a></li>
+    </ul>
+  </nav>
+
+  <main>
+    <section class="hero hero--short">
+      <div class="hero-text">
+        <a href="ee66-labs.html" class="back-link">&larr; Back to EE 66 Labs</a>
+        <div class="hero-tag">EE 66 | Lab 3 | Fall 2026</div>
+        <h1 class="hero-title">Voice Recognition<br /><span class="accent">with the SVD.</span></h1>
+        <p class="hero-sub">A spoken-word classifier built on principal component analysis. Each recording is aligned, enveloped, and projected onto three principal components from the SVD; a nearest-centroid rule then classifies all 48 held-out recordings correctly.</p>
+        <p class="headline-result"><b>Headline</b>48/48 held-out recordings classified &middot; 4,000 samples reduced to 3 numbers &middot; no neural network</p>
+        <div class="project-meta">
+          <span class="tech-pill">Python</span>
+          <span class="tech-pill">NumPy</span>
+          <span class="tech-pill">SVD</span>
+          <span class="tech-pill">PCA</span>
+          <span class="tech-pill">Classification</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="section project-body">
+      <dl class="at-a-glance">
+        <div><dt>Course</dt><dd>EE 66, Signals, Dynamics &amp; Information</dd></div>
+        <div><dt>Lab</dt><dd>Lab 3: Voice Recognition</dd></div>
+        <div><dt>Timeline</dt><dd>Week 8, Fall 2026</dd></div>
+        <div><dt>Topics</dt><dd>SVD, principal component analysis, classification</dd></div>
+      </dl>
+
+      <div class="stat-row"><div class="stat"><span class="stat-num">48/48</span><span class="stat-label">held-out recordings classified correctly</span></div><div class="stat"><span class="stat-num">3</span><span class="stat-label">principal components per recording (from 4,000 samples)</span></div><div class="stat"><span class="stat-num">80.4%</span><span class="stat-label">of the variance kept by those 3 components</span></div><div class="stat"><span class="stat-num">4</span><span class="stat-label">words in the classifier</span></div></div>
+
+      <h2>Overview</h2>
+      <p>A classifier that recognizes which of four spoken words is in a recording (<em>jack</em>, <em>jason</em>, <em>jessica</em> or <em>entanglement</em>) using principal component analysis (PCA) built on the SVD, with no neural network. It learns from 40 three-second recordings per word, sampled at 5.4&nbsp;kHz. The same pipeline can also classify words spoken live into a laptop microphone.</p>
+
+      <h2>Approach</h2>
+      <ul>
+          <li><strong>Split the data.</strong> 70/30 per word: 28 training and 12 test recordings each.</li>
+          <li><strong>Make recordings comparable.</strong> Find where each recording first rises above 25% of its peak, keep 400 samples before that point, and crop to 4,000 samples (about 0.74&nbsp;s). Then low-pass filter to keep the loudness envelope of the word, and normalize.</li>
+          <li><strong>Find the principal components.</strong> Stack the 112 training recordings as rows of a 112&nbsp;&times;&nbsp;4,000 matrix, subtract the mean recording, and take the SVD. The top three right singular vectors are the principal components.</li>
+          <li><strong>Reduce each recording to three numbers.</strong> Project every recording onto those three components, and average each word's training projections into a centroid.</li>
+          <li><strong>Classify.</strong> A new recording gets the word whose centroid is closest to its projection.</li>
+        </ul>
+        <div class="formula-block">
+          A &minus; 1&mu;<sup>T</sup> = U&Sigma;V<sup>T</sup> &nbsp;&nbsp;(rows of A are aligned training recordings, &mu; is the mean recording)<br />
+          p = V<sub>3</sub><sup>T</sup>(x &minus; &mu;) &nbsp;&nbsp;&rarr;&nbsp;&nbsp; word = argmin<sub>w</sub> &Vert;p &minus; c<sub>w</sub>&Vert;
+          <div class="muted-line" style="margin-top:0.75rem;">V<sub>3</sub> holds the first three principal components, p is a recording's 3-number projection, c<sub>w</sub> is word w's training centroid.</div>
+        </div>
+
+      <h2>Results</h2>
+      <div class="spec-table-wrap">
+          <table class="spec-table">
+            <thead>
+              <tr><th>Metric</th><th>Result</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Test accuracy (48 held-out recordings)</td><td>48 / 48 &middot; 100% for every word (goal: 80%)</td></tr>
+              <tr><td>Dimensions per recording</td><td>4,000 samples &rarr; 3 numbers</td></tr>
+              <tr><td>Variance kept by the top 3 components</td><td>80.4%</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="shot-grid" style="grid-template-columns:minmax(0, 560px);">
+          <figure class="shot">
+            <img src="assets/images/ee66/lab3/pca-clusters.png" alt="3D scatter plot of test recordings in principal component space, forming four separate colored clusters with black X centroids" loading="lazy" />
+            <figcaption>Held-out test recordings projected onto the first three principal components. Each word forms its own cluster around its training centroid (&times;), which is why a nearest-centroid rule is enough.</figcaption>
+          </figure>
+        </div>
+
+      <h2>What I learned</h2>
+      <ul>
+          <li><strong>The SVD finds structure you can't see by eye.</strong> Three numbers out of 4,000 were enough to separate four words perfectly on unseen recordings.</li>
+          <li><strong>Preprocessing sets the ceiling.</strong> Most of the work was making 160 messy human recordings consistent before any linear algebra happened. The PCA step itself is only a few lines.</li>
+          <li><strong>Simple classifiers work when the representation is good.</strong> Once the words separate in PCA space, a nearest-centroid rule needs no training beyond computing averages.</li>
+          <li><strong>The geometry matches how the words sound.</strong> <em>Jack</em> and <em>jason</em>, which share the same opening sound, land close together. <em>Entanglement</em>, the longest and most different word, sits far from the rest.</li>
+        </ul>
+
+      <div class="note-box">
+        Lab starter materials are from the <a href="https://eecs66.org/" target="_blank" rel="noopener">EE 66 course staff</a>. The implementation and write-up are my own; the notebook code is kept private in line with course academic-integrity policy.
+      </div>
+
+      <nav class="lab-pager"><a href="ee66-lab2-aps.html">&larr; Lab 2: Acoustic Positioning System</a><a href="ee66-lab4-image-deconvolution.html">Lab 4: Image Deconvolution &rarr;</a></nav>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p>Troy &mdash; UC Berkeley &rsquo;27</p>
+    <div class="footer-links">
+      <a href="mailto:troyluanpham@gmail.com" class="social-icon social-icon--sm" aria-label="Email" title="Email"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></a>
+      <a href="https://www.linkedin.com/in/troy-pham" target="_blank" rel="noopener" class="social-icon social-icon--sm" aria-label="LinkedIn" title="LinkedIn"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg></a>
+      <a href="https://github.com/tpshadow11" target="_blank" rel="noopener" class="social-icon social-icon--sm" aria-label="GitHub" title="GitHub"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg></a>
+      <a href="https://www.youtube.com/@troyphammusic" target="_blank" rel="noopener" class="social-icon social-icon--sm" aria-label="YouTube" title="YouTube"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z"/><polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"/></svg></a>
+      <a href="https://www.instagram.com/troypham2005/" target="_blank" rel="noopener" class="social-icon social-icon--sm" aria-label="Instagram" title="Instagram"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg></a>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+</body>
+</html>

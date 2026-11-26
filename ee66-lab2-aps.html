@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EE 66 Lab 2: Acoustic Positioning System — Troy</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;700&amp;family=Inter:wght@400..800&amp;display=swap" rel="stylesheet" />
+</head>
+<body>
+  <nav class="navbar">
+    <a href="index.html" class="nav-logo" aria-label="Home"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11.5 12 4l9 7.5" /><path d="M5.5 10v9a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-9" /><path d="M9.5 20v-6h5v6" /></svg></a>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="about.html">About</a></li>
+      <li><a href="projects.html" class="active">Projects</a></li>
+      <li><a href="journals.html">Journals</a></li>
+      <li><a href="resume.html">Resume</a></li>
+      <li><a href="contact.html">Contact</a></li>
+    </ul>
+  </nav>
+
+  <main>
+    <section class="hero hero--short">
+      <div class="hero-text">
+        <a href="ee66-labs.html" class="back-link">&larr; Back to EE 66 Labs</a>
+        <div class="hero-tag">EE 66 | Lab 2 | Fall 2026</div>
+        <h1 class="hero-title">GPS, Rebuilt<br /><span class="accent">with Sound.</span></h1>
+        <p class="hero-sub">Six speakers loop unique Gold codes and one microphone records the mix. Cross-correlation separates the speakers, arrival-time differences become a linear system, and least squares solves for the microphone position, landing within 0.4 cm on a real recording.</p>
+        <p class="headline-result"><b>Headline</b>0.4&nbsp;cm error on a real recording &middot; worst simulated error 1.2&nbsp;cm &middot; one microphone, six speakers, no shared clock</p>
+        <div class="project-meta">
+          <span class="tech-pill">Python</span>
+          <span class="tech-pill">NumPy</span>
+          <span class="tech-pill">Cross-Correlation</span>
+          <span class="tech-pill">Gold Codes</span>
+          <span class="tech-pill">Least Squares</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="section project-body">
+      <dl class="at-a-glance">
+        <div><dt>Course</dt><dd>EE 66, Signals, Dynamics &amp; Information</dd></div>
+        <div><dt>Lab</dt><dd>Lab 2: Acoustic Positioning System</dd></div>
+        <div><dt>Timeline</dt><dd>Week 6, Fall 2026</dd></div>
+        <div><dt>Topics</dt><dd>Cross-correlation, TDOA, least squares</dd></div>
+      </dl>
+
+      <div class="stat-row"><div class="stat"><span class="stat-num">0.4 cm</span><span class="stat-label">position error on a real recording at the table center</span></div><div class="stat"><span class="stat-num">1.2 cm</span><span class="stat-label">worst error across 9 noisy simulations</span></div><div class="stat"><span class="stat-num">6</span><span class="stat-label">speakers separated from one microphone signal</span></div><div class="stat"><span class="stat-num">7.7 mm</span><span class="stat-label">of sound travel per sample at 44.1 kHz</span></div></div>
+
+      <h2>Overview</h2>
+      <p>GPS, rebuilt with sound. Six speakers around a lab table each loop their own coded beacon signal, and a single microphone records all of them mixed together. From that one recording, the system works out where the microphone is in 2D. It does this using only the differences in when each speaker's signal arrives, with no shared clock between the speakers and the microphone.</p>
+
+      <h2>Approach</h2>
+      <ul>
+          <li><strong>Separate the speakers.</strong> Each speaker plays a Gold code, a pseudorandom binary sequence that correlates strongly with itself at zero shift and weakly with everything else. Cross-correlating the recording with each stored code (periodically, since the codes loop) gives one sharp peak per speaker, and the peak's position is that signal's arrival time.</li>
+          <li><strong>Average out the noise.</strong> The codes repeat every 230&nbsp;ms and the recording runs about 2.5&nbsp;s, giving roughly ten periods. Averaging the correlation across periods keeps the peaks and suppresses the noise.</li>
+          <li><strong>Peaks to time differences.</strong> Measure every peak relative to beacon 0 and divide by the 44.1&nbsp;kHz sampling rate to get the time difference of arrival (TDOA) for each speaker.</li>
+          <li><strong>Make it linear.</strong> The range equations are quadratic in position, and the true start time &tau;<sub>0</sub> is unknown. Subtracting beacon 0's equation from the others cancels the quadratic term. Treating &tau;<sub>0</sub> as a third unknown alongside r<sub>x</sub> and r<sub>y</sub> then leaves five linear equations in three unknowns.</li>
+          <li><strong>Solve with least squares.</strong> With more equations than unknowns and noisy measurements, the system is inconsistent, so it's solved in the least-squares sense.</li>
+        </ul>
+        <div class="formula-block">
+          2a<sub>i,x</sub>&thinsp;r<sub>x</sub> + 2a<sub>i,y</sub>&thinsp;r<sub>y</sub> + 2v<sub>s</sub>&sup2;&Delta;&tau;<sub>i</sub>&thinsp;&tau;<sub>0</sub> = a<sub>i,x</sub>&sup2; + a<sub>i,y</sub>&sup2; &minus; v<sub>s</sub>&sup2;&Delta;&tau;<sub>i</sub>&sup2;, &nbsp;&nbsp; i = 1, &hellip;, 5<br />
+          A&thinsp;x = b &nbsp;&rarr;&nbsp; x&#770; = (A<sup>T</sup>A)<sup>&minus;1</sup>A<sup>T</sup>b, &nbsp;&nbsp; x = [r<sub>x</sub>, r<sub>y</sub>, &tau;<sub>0</sub>]<sup>T</sup>
+          <div class="muted-line" style="margin-top:0.75rem;">a<sub>i</sub> is speaker i's known position (beacon 0 at the origin), &Delta;&tau;<sub>i</sub> its measured TDOA, v<sub>s</sub> &asymp; 340 m/s the speed of sound.</div>
+        </div>
+
+      <h2>Results</h2>
+      <div class="spec-table-wrap">
+          <table class="spec-table">
+            <thead>
+              <tr><th>Test</th><th>Trials</th><th>Result</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Simulated noisy signals, 5&nbsp;m &times; 5&nbsp;m layout, target (1.20, 3.60)&nbsp;m, three noise levels</td><td>9</td><td>Worst error 1.2&nbsp;cm</td></tr>
+              <tr><td>Real recording, microphone at the table's center (25, 30)&nbsp;cm</td><td>1</td><td>Estimated (25.0, 30.4)&nbsp;cm &middot; 0.4&nbsp;cm off</td></tr>
+              <tr><td>Lab test recording</td><td>1</td><td>Estimated (4.4, 36.4)&nbsp;cm (see figure)</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="shot-grid" style="grid-template-columns:minmax(0, 640px);">
+          <figure class="shot">
+            <img src="assets/images/ee66/lab2/location.png" alt="Lab table with six beacons marked and five colored lines from the linear equations intersecting at the estimated microphone position" loading="lazy" />
+            <figcaption>Each colored line is one linear equation from the system (one per speaker after beacon 0). They nearly meet at one point, and least squares picks the best compromise: the estimated microphone position, in meters.</figcaption>
+          </figure>
+        </div>
+
+      <h2>What I learned</h2>
+      <ul>
+          <li><strong>Correlation is a detector.</strong> Because Gold codes barely correlate with each other, one microphone can pull six overlapping signals apart just by correlating against each known code.</li>
+          <li><strong>Repetition beats noise.</strong> Recording many periods of a looping signal and averaging them is a cheap, reliable way to get clean peaks out of a noisy room.</li>
+          <li><strong>An unknown clock can just be another variable.</strong> Instead of synchronizing the microphone with the speakers, the start time becomes a third unknown in the linear system. That's the same trick real GPS receivers use.</li>
+          <li><strong>The sampling rate sets the resolution.</strong> At 44.1&nbsp;kHz, one sample is about 7.7&nbsp;mm of sound travel, so centimeter-level accuracy is close to what this setup can do.</li>
+        </ul>
+
+      <div class="note-box">
+        Lab starter materials are from the <a href="https://eecs66.org/" target="_blank" rel="noopener">EE 66 course staff</a>. The implementation and write-up are my own; the notebook code is kept private in line with course academic-integrity policy.
+      </div>
+
+      <nav class="lab-pager"><a href="ee66-lab1-shazam.html">&larr; Lab 1: Shazam</a><a href="ee66-lab3-voice-recognition.html">Lab 3: Voice Recognition &rarr;</a></nav>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p>Troy &mdash; UC Berkeley &rsquo;27</p>
+    <div class="footer-links">
+      <a href="mailto:troyluanpham@gmail.com" class="social-icon social-icon--sm" aria-label="Email" title="Email"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></a>
+      <a href="https://www.linkedin.com/in/troy-pham" target="_blank" rel="noopener" class="social-icon social-icon--sm" aria-label="LinkedIn" title="LinkedIn"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg></a>
+      <a href="https://github.com/tpshadow11" target="_blank" rel="noopener" class="social-icon social-icon--sm" aria-label="GitHub" title="GitHub"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg></a>
+      <a href="https://www.youtube.com/@troyphammusic" target="_blank" rel="noopener" class="social-icon social-icon--sm" aria-label="YouTube" title="YouTube"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z"/><polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"/></svg></a>
+      <a href="https://www.instagram.com/troypham2005/" target="_blank" rel="noopener" class="social-icon social-icon--sm" aria-label="Instagram" title="Instagram"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg></a>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+</body>
+</html>

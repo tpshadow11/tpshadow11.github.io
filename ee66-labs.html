@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EE 66 Labs — Troy</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;700&amp;family=Inter:wght@400..800&amp;display=swap" rel="stylesheet" />
+</head>
+<body>
+  <nav class="navbar">
+    <a href="index.html" class="nav-logo" aria-label="Home"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11.5 12 4l9 7.5" /><path d="M5.5 10v9a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-9" /><path d="M9.5 20v-6h5v6" /></svg></a>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="about.html">About</a></li>
+      <li><a href="projects.html" class="active">Projects</a></li>
+      <li><a href="journals.html">Journals</a></li>
+      <li><a href="resume.html">Resume</a></li>
+      <li><a href="contact.html">Contact</a></li>
+    </ul>
+  </nav>
+
+  <main>
+    <section class="hero hero--short">
+      <div class="hero-text">
+        <a href="projects.html" class="back-link">&larr; Back to Projects</a>
+        <div class="hero-tag">EE 66 | UC Berkeley | Fall 2026</div>
+        <h1 class="hero-title">Signals, SVD &amp;<br /><span class="accent">Imaging Labs.</span></h1>
+        <p class="hero-sub">Five labs that turn the linear algebra and signal processing from EE 66 (Introduction to Signals, Dynamics, and Information) into working systems: a song identifier, an indoor positioning system, a voice classifier, an image deblurrer, and MRI/CT reconstruction.</p>
+        <p class="headline-result"><b>Headline</b>Song ID survives heavy noise &middot; 0.4&nbsp;cm positioning from one microphone &middot; 48/48 words classified &middot; CT at one-third the dose</p>
+        <div class="project-meta">
+          <span class="tech-pill">Python</span>
+          <span class="tech-pill">NumPy / SciPy</span>
+          <span class="tech-pill">marimo</span>
+          <span class="tech-pill">FFT &amp; Spectrograms</span>
+          <span class="tech-pill">Least Squares</span>
+          <span class="tech-pill">SVD / PCA</span>
+          <span class="tech-pill">Regularization</span>
+          <span class="tech-pill">Compressed Sensing</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="journal-intro">
+        <p class="lead">Five labs from EE 66 at UC Berkeley, each a working system built on the course's linear algebra and signal processing.</p>
+        <p>Each write-up covers the problem, my approach, results with figures from my own runs, and what I took away. The notebook code is kept private in line with course academic-integrity policy.</p>
+      </div>
+
+      <h2 class="section-label">Lab Logs</h2>
+
+      <article class="journal-entry">
+        <div class="journal-when">
+          <strong>Lab 01</strong>
+          Week 5, Fall 2026<br />DFT
+        </div>
+        <div>
+          <div class="card-tag ee">Signals | Audio</div>
+          <h3><a href="ee66-lab1-shazam.html">Shazam: Audio Fingerprinting</a></h3>
+          <p>A simplified Shazam: spectrogram peaks become a "constellation map," peak pairs become hashes, and a clip is identified by matching hashes against a database. It still finds the right song with half the clip silenced or buried in heavy noise.</p>
+          <div class="card-footer">
+            <span class="tech-pill">NumPy / SciPy</span>
+            <span class="tech-pill">FFT</span>
+            <span class="tech-pill">Spectrograms</span>
+            <a href="ee66-lab1-shazam.html" class="card-link">Read write-up &rarr;</a>
+          </div>
+        </div>
+      </article>
+
+      <article class="journal-entry">
+        <div class="journal-when">
+          <strong>Lab 02</strong>
+          Week 6, Fall 2026<br />Cross-correlation
+        </div>
+        <div>
+          <div class="card-tag ee">Signals | Localization</div>
+          <h3><a href="ee66-lab2-aps.html">Acoustic Positioning System</a></h3>
+          <p>Six speakers loop unique Gold codes and one microphone records the mix. Cross-correlation separates the speakers, arrival-time differences become a linear system, and least squares solves for the microphone position, landing within 0.4 cm on a real recording.</p>
+          <div class="card-footer">
+            <span class="tech-pill">NumPy</span>
+            <span class="tech-pill">Cross-Correlation</span>
+            <span class="tech-pill">Gold Codes</span>
+            <a href="ee66-lab2-aps.html" class="card-link">Read write-up &rarr;</a>
+          </div>
+        </div>
+      </article>
+
+      <article class="journal-entry">
+        <div class="journal-when">
+          <strong>Lab 03</strong>
+          Week 8, Fall 2026<br />SVD
+        </div>
+        <div>
+          <div class="card-tag ds">Data Science | Speech</div>
+          <h3><a href="ee66-lab3-voice-recognition.html">Voice Recognition with PCA</a></h3>
+          <p>A spoken-word classifier built on principal component analysis. Each recording is aligned, enveloped, and projected onto three principal components from the SVD; a nearest-centroid rule then classifies all 48 held-out recordings correctly.</p>
+          <div class="card-footer">
+            <span class="tech-pill">NumPy</span>
+            <span class="tech-pill">SVD</span>
+            <span class="tech-pill">PCA</span>
+            <a href="ee66-lab3-voice-recognition.html" class="card-link">Read write-up &rarr;</a>
+          </div>
+        </div>
+      </article>
+
+      <article class="journal-entry">
+        <div class="journal-when">
+          <strong>Lab 04</strong>
+          Week 10, Fall 2026<br />2D convolution
+        </div>
+        <div>
+          <div class="card-tag ee">Signals | Imaging</div>
+          <h3><a href="ee66-lab4-image-deconvolution.html">Image Deconvolution</a></h3>
+          <p>Motion blur modeled as convolution with a point-spread function. The direct inverse amplifies noise into static, while Fourier-domain Tikhonov regularization recovers the image; a no-reference score also identifies the unknown blur direction.</p>
+          <div class="card-footer">
+            <span class="tech-pill">NumPy</span>
+            <span class="tech-pill">2D FFT</span>
+            <span class="tech-pill">Tikhonov Regularization</span>
+            <a href="ee66-lab4-image-deconvolution.html" class="card-link">Read write-up &rarr;</a>
+          </div>
+        </div>
+      </article>
+
+      <article class="journal-entry">
+        <div class="journal-when">
+          <strong>Lab 05</strong>
+          Week 12, Fall 2026<br />k-space
+        </div>
+        <div>
+          <div class="card-tag ee">Signals | Medical Imaging</div>
+          <h3><a href="ee66-lab5-medical-imaging.html">Medical Imaging: MRI &amp; CT</a></h3>
+          <p>MRI scanners measure Fourier coefficients and CT scanners measure line integrals. I designed a 25% k-space mask (center disk plus spiral) reconstructed with compressed sensing, and chose the fewest CT views that meet explicit error and dose limits.</p>
+          <div class="card-footer">
+            <span class="tech-pill">NumPy</span>
+            <span class="tech-pill">2D FFT</span>
+            <span class="tech-pill">Compressed Sensing</span>
+            <a href="ee66-lab5-medical-imaging.html" class="card-link">Read write-up &rarr;</a>
+          </div>
+        </div>
+      </article>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p>Troy &mdash; UC Berkeley &rsquo;27</p>
+    <div class="footer-links">
+      <a href="mailto:troyluanpham@gmail.com" class="social-icon social-icon--sm" aria-label="Email" title="Email"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></a>
+      <a href="https://www.linkedin.com/in/troy-pham" target="_blank" rel="noopener" class="social-icon social-icon--sm" aria-label="LinkedIn" title="LinkedIn"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg></a>
+      <a href="https://github.com/tpshadow11" target="_blank" rel="noopener" class="social-icon social-icon--sm" aria-label="GitHub" title="GitHub"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg></a>
+      <a href="https://www.youtube.com/@troyphammusic" target="_blank" rel="noopener" class="social-icon social-icon--sm" aria-label="YouTube" title="YouTube"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z"/><polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"/></svg></a>
+      <a href="https://www.instagram.com/troypham2005/" target="_blank" rel="noopener" class="social-icon social-icon--sm" aria-label="Instagram" title="Instagram"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg></a>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+</body>
+</html>

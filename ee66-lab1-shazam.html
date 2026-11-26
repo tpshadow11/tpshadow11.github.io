@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EE 66 Lab 1: Shazam — Troy</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;700&amp;family=Inter:wght@400..800&amp;display=swap" rel="stylesheet" />
+</head>
+<body>
+  <nav class="navbar">
+    <a href="index.html" class="nav-logo" aria-label="Home"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11.5 12 4l9 7.5" /><path d="M5.5 10v9a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-9" /><path d="M9.5 20v-6h5v6" /></svg></a>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="about.html">About</a></li>
+      <li><a href="projects.html" class="active">Projects</a></li>
+      <li><a href="journals.html">Journals</a></li>
+      <li><a href="resume.html">Resume</a></li>
+      <li><a href="contact.html">Contact</a></li>
+    </ul>
+  </nav>
+
+  <main>
+    <section class="hero hero--short">
+      <div class="hero-text">
+        <a href="ee66-labs.html" class="back-link">&larr; Back to EE 66 Labs</a>
+        <div class="hero-tag">EE 66 | Lab 1 | Fall 2026</div>
+        <h1 class="hero-title">Building<br /><span class="accent">Shazam.</span></h1>
+        <p class="hero-sub">A simplified Shazam: spectrogram peaks become a "constellation map," peak pairs become hashes, and a clip is identified by matching hashes against a database. It still finds the right song with half the clip silenced or buried in heavy noise.</p>
+        <p class="headline-result"><b>Headline</b>10/10 clean clips identified &middot; still correct with half of a clip silenced &middot; 6/6 under heavy noise on full clips</p>
+        <div class="project-meta">
+          <span class="tech-pill">Python</span>
+          <span class="tech-pill">NumPy / SciPy</span>
+          <span class="tech-pill">FFT</span>
+          <span class="tech-pill">Spectrograms</span>
+          <span class="tech-pill">Hashing</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="section project-body">
+      <dl class="at-a-glance">
+        <div><dt>Course</dt><dd>EE 66, Signals, Dynamics &amp; Information</dd></div>
+        <div><dt>Lab</dt><dd>Lab 1: Shazam</dd></div>
+        <div><dt>Timeline</dt><dd>Week 5, Fall 2026</dd></div>
+        <div><dt>Topics</dt><dd>DFT, spectrograms, peak finding, hashing</dd></div>
+      </dl>
+
+      <div class="stat-row"><div class="stat"><span class="stat-num">10/10</span><span class="stat-label">clean 20-second clips identified</span></div><div class="stat"><span class="stat-num">2/2</span><span class="stat-label">identified with 10 of 20 seconds silenced</span></div><div class="stat"><span class="stat-num">6/6</span><span class="stat-label">identified under heavy Gaussian noise (60-second clips)</span></div><div class="stat"><span class="stat-num">4096</span><span class="stat-label">sample DFT window for the spectrogram</span></div></div>
+
+      <h2>Overview</h2>
+      <p>A simplified version of Shazam's audio fingerprinting, built in Python. Given a short clip that may be noisy or partly silent, the system identifies which song it came from. It compares compact fingerprints against a database instead of comparing raw audio. I tested it on 60-second excerpts of <em>Viva La Vida</em> and <em>Mr. Brightside</em>.</p>
+
+      <h2>Approach</h2>
+      <ul>
+          <li><strong>Why one DFT isn't enough.</strong> The DFT of a 10-second clip shows which frequencies appear, but not when. One-second slices of the same song have clearly different spectra, because music's frequency content keeps changing.</li>
+          <li><strong>Spectrogram.</strong> Split the audio (sampled at 48&nbsp;kHz) into 4096-sample windows and take a DFT of each, giving a time&ndash;frequency image of the song.</li>
+          <li><strong>Constellation map.</strong> Run a 51&times;51 maximum filter over the spectrogram and keep only points that are the local maximum and above an energy threshold. This reduces thousands of points to a few hundred strong peaks.</li>
+          <li><strong>Fingerprints.</strong> Hash each peak with each of the next 15 peaks, using both frequencies and the time gap between them, and tag the hash with the first peak's time. The result is a list of (hash, time) pairs.</li>
+          <li><strong>Matching.</strong> Look up the clip's hashes in the database. The song with the most matching hashes wins, and its share of all matches is the confidence.</li>
+        </ul>
+        <div class="formula-block">
+          Short-time DFT: &nbsp;X<sub>m</sub>[k] = &Sigma;<sub>n=0</sub><sup>N&minus;1</sup> x[n + mH] &middot; w[n] &middot; e<sup>&minus;j2&pi;kn/N</sup>, &nbsp; N = 4096<br />
+          Peak test: &nbsp;S(f, t) = max S over a 51&times;51 neighborhood &nbsp;and&nbsp; S(f, t) &gt; threshold
+          <div class="muted-line" style="margin-top:0.75rem;">m indexes the window, H is the hop between windows, w is the window function, S = |X|&sup2; is the spectrogram.</div>
+        </div>
+
+      <h2>Results</h2>
+      <div class="spec-table-wrap">
+          <table class="spec-table">
+            <thead>
+              <tr><th>Test</th><th>Trials</th><th>Correct</th><th>Confidence</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Clean 20-second clip</td><td>10</td><td>10 / 10</td><td>100% (one at 92.9%)</td></tr>
+              <tr><td>Heavy Gaussian noise (&mu; = &sigma; = 10,000), 60-second clip</td><td>6</td><td>6 / 6</td><td>96&ndash;100%</td></tr>
+              <tr><td>Heavy Gaussian noise, 20-second clip</td><td>10</td><td>6 / 10</td><td>100% when matched</td></tr>
+              <tr><td>&ldquo;Blocked speaker&rdquo;: 10 of 20 seconds zeroed out</td><td>2</td><td>2 / 2</td><td>100%</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>The noise is severe: the audio is 16-bit, so its samples only reach about &plusmn;32,767, and the clips sound almost unrecognizable. Every noisy failure was <em>Viva La Vida</em> on a 20-second clip (1 of 5 matched; <em>Mr. Brightside</em> went 5 for 5). Those clips returned no matching hashes at all rather than the wrong song.</p>
+        <div class="shot-grid" style="grid-template-columns:1fr;">
+          <figure class="shot">
+            <img src="assets/images/ee66/lab1/spectrograms.jpg" alt="Spectrograms of Viva La Vida and Mr. Brightside over 60 seconds, frequency 0 to 24 kHz, colored by dB" loading="lazy" />
+            <figcaption>Spectrograms of both songs (4096-point windows, in dB). Each song has its own time&ndash;frequency texture, which is what the fingerprints are built from.</figcaption>
+          </figure>
+          <figure class="shot">
+            <img src="assets/images/ee66/lab1/peaks.jpg" alt="Spectrogram of Viva La Vida with black dots marking the selected local peaks" loading="lazy" />
+            <figcaption>Constellation map for <em>Viva La Vida</em>: the 51&times;51 max filter and energy threshold reduce the spectrogram to a few hundred peaks (black dots), which become the fingerprints.</figcaption>
+          </figure>
+        </div>
+
+      <h2>What I learned</h2>
+      <ul>
+          <li><strong>Time and frequency are a trade-off.</strong> One DFT gives the best frequency detail but no timing. A spectrogram gets timing back by using short windows, and the 4096-sample window size balances the two.</li>
+          <li><strong>Keeping less made it more robust.</strong> Throwing away everything except the strongest local peaks made the fingerprint survive heavy noise and long gaps of silence. It only takes a fraction of the hashes agreeing to pick the right song.</li>
+          <li><strong>Relative timing makes it work anywhere in the song.</strong> Hashing pairs of peaks by how far apart they are, not by when they happen, lets a clip taken from any point in the song match.</li>
+          <li><strong>The database limits robustness.</strong> <em>Viva La Vida</em> has far fewer fingerprints stored (3,353 vs. 5,831 for <em>Mr. Brightside</em>), so a short, noisy clip of it has fewer chances to produce a match.</li>
+        </ul>
+
+      <div class="note-box">
+        Lab starter materials are from the <a href="https://eecs66.org/" target="_blank" rel="noopener">EE 66 course staff</a>. The implementation and write-up are my own; the notebook code is kept private in line with course academic-integrity policy.
+      </div>
+
+      <nav class="lab-pager"><span></span><a href="ee66-lab2-aps.html">Lab 2: Acoustic Positioning System &rarr;</a></nav>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p>Troy &mdash; UC Berkeley &rsquo;27</p>
+    <div class="footer-links">
+      <a href="mailto:troyluanpham@gmail.com" class="social-icon social-icon--sm" aria-label="Email" title="Email"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></a>
+      <a href="https://www.linkedin.com/in/troy-pham" target="_blank" rel="noopener" class="social-icon social-icon--sm" aria-label="LinkedIn" title="LinkedIn"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg></a>
+      <a href="https://github.com/tpshadow11" target="_blank" rel="noopener" class="social-icon social-icon--sm" aria-label="GitHub" title="GitHub"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg></a>
+      <a href="https://www.youtube.com/@troyphammusic" target="_blank" rel="noopener" class="social-icon social-icon--sm" aria-label="YouTube" title="YouTube"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z"/><polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"/></svg></a>
+      <a href="https://www.instagram.com/troypham2005/" target="_blank" rel="noopener" class="social-icon social-icon--sm" aria-label="Instagram" title="Instagram"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg></a>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EE 66 Lab 5: Medical Imaging — Troy</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;700&amp;family=Inter:wght@400..800&amp;display=swap" rel="stylesheet" />
+</head>
+<body>
+  <nav class="navbar">
+    <a href="index.html" class="nav-logo" aria-label="Home"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11.5 12 4l9 7.5" /><path d="M5.5 10v9a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-9" /><path d="M9.5 20v-6h5v6" /></svg></a>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="about.html">About</a></li>
+      <li><a href="projects.html" class="active">Projects</a></li>
+      <li><a href="journals.html">Journals</a></li>
+      <li><a href="resume.html">Resume</a></li>
+      <li><a href="contact.html">Contact</a></li>
+    </ul>
+  </nav>
+
+  <main>
+    <section class="hero hero--short">
+      <div class="hero-text">
+        <a href="ee66-labs.html" class="back-link">&larr; Back to EE 66 Labs</a>
+        <div class="hero-tag">EE 66 | Lab 5 | Fall 2026</div>
+        <h1 class="hero-title">Faster MRI,<br /><span class="accent">Lower-Dose CT.</span></h1>
+        <p class="hero-sub">MRI scanners measure Fourier coefficients and CT scanners measure line integrals. I designed a 25% k-space mask (center disk plus spiral) reconstructed with compressed sensing, and chose the fewest CT views that meet explicit error and dose limits.</p>
+        <p class="headline-result"><b>Headline</b>Brain MRI from 25% of k-space with the lowest error of the strategies tested &middot; CT at 33% dose within the error limit</p>
+        <div class="project-meta">
+          <span class="tech-pill">Python</span>
+          <span class="tech-pill">NumPy</span>
+          <span class="tech-pill">2D FFT</span>
+          <span class="tech-pill">Compressed Sensing</span>
+          <span class="tech-pill">Wavelets</span>
+          <span class="tech-pill">Filtered Backprojection</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="section project-body">
+      <dl class="at-a-glance">
+        <div><dt>Course</dt><dd>EE 66, Signals, Dynamics &amp; Information</dd></div>
+        <div><dt>Lab</dt><dd>Lab 5: Medical Imaging</dd></div>
+        <div><dt>Timeline</dt><dd>Week 12, Fall 2026</dd></div>
+        <div><dt>Topics</dt><dd>k-space, compressed sensing, filtered backprojection</dd></div>
+      </dl>
+
+      <div class="stat-row"><div class="stat"><span class="stat-num">25%</span><span class="stat-label">of k-space used for the brain MRI design</span></div><div class="stat"><span class="stat-num">0.131</span><span class="stat-label">NRMSE for my design vs. 0.157 sampling only the center</span></div><div class="stat"><span class="stat-num">0.888</span><span class="stat-label">SSIM with compressed sensing (vs. 0.773 zero-fill)</span></div><div class="stat"><span class="stat-num">33%</span><span class="stat-label">of full CT dose at the image-quality target</span></div></div>
+
+      <h2>Overview</h2>
+      <p>How MRI and CT scanners turn raw measurements into images, and how to take fewer measurements without losing the diagnosis. An MRI scanner measures the 2D Fourier transform of the body (k-space), so scan time depends on how much of k-space you sample. A CT scanner measures X-ray line integrals from many angles, so radiation dose depends on how many angles you use. I designed reduced-measurement strategies for both.</p>
+
+      <h2>Approach</h2>
+      <ul>
+          <li><strong>MRI as a linear measurement.</strong> Write the scanner as y = MFx: a 2D FFT F followed by a mask M that keeps only the sampled frequencies. Low frequencies carry overall contrast; high frequencies carry edges. Evenly skipped lines create ghost copies of the image.</li>
+          <li><strong>Faster leg scans (50% and 25% of k-space).</strong> Sample every other column, so the ghost copy lands in the empty space beside the calf. For 25%, also keep only the central band.</li>
+          <li><strong>Compressed sensing.</strong> Medical images are sparse in a wavelet basis, so missing k-space can be filled in by solving for the sparsest image that matches the measurements. This uses basis pursuit denoising (BPD) with Haar wavelets.</li>
+          <li><strong>A 25% brain scan.</strong> A brain fills the whole frame, so the ghost trick fails. My mask is a fully sampled disk at the center of k-space (radius 40) plus an 8-turn spiral that reaches the high frequencies. The spiral makes the missing data look like noise instead of ghosts, which BPD can remove.</li>
+          <li><strong>CT dose budget.</strong> Reconstruct a phantom with filtered backprojection from 24 to 90 evenly spaced angles. Pick the fewest views meeting two requirements: error (NRMSE) at most 0.15, and dose at most 50% of a 180-view scan.</li>
+        </ul>
+        <div class="formula-block">
+          MRI: &nbsp;y = M&thinsp;F&thinsp;x + n &nbsp;&nbsp;&nbsp; CT: &nbsp;y<sub>&theta;</sub>(s) = &int; &mu;(x, y) d&#8467; along each ray<br />
+          BPD: &nbsp;w&#770; = argmin<sub>w</sub> &frac12;&Vert;M&thinsp;F&thinsp;W<sup>&minus;1</sup>w &minus; y&Vert;&sup2; + &lambda;&Vert;w&Vert;<sub>1</sub>, &nbsp;&nbsp; x&#770; = W<sup>&minus;1</sup>w&#770;
+          <div class="muted-line" style="margin-top:0.75rem;">W is the Haar wavelet transform, and the &#8467;<sub>1</sub> penalty favors images with few nonzero wavelet coefficients. &mu; is the tissue's X-ray attenuation.</div>
+        </div>
+
+      <h2>Results</h2>
+      <div class="spec-table-wrap">
+          <table class="spec-table">
+            <thead>
+              <tr><th>Experiment</th><th>Baseline</th><th>Result</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Compressed sensing, 50% random k-space</td><td>Zero-fill: NRMSE 0.199, SSIM 0.773</td><td>BPD: NRMSE 0.141, SSIM 0.888</td></tr>
+              <tr><td>Brain MRI, 25% of k-space</td><td>Center only: NRMSE 0.157, SSIM 0.856</td><td>My disk + spiral, BPD: NRMSE 0.131, SSIM 0.862</td></tr>
+              <tr><td>CT view budget (NRMSE &le; 0.15, dose &le; 50%)</td><td>180 views (full dose)</td><td>60 views: NRMSE 0.137 at 33% dose</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>The brain design has the lowest error of the 25% strategies and keeps sharper edges than sampling only the center. The trade-off is a slightly blocky texture from the Haar wavelets. For CT, 45 views (25% dose) just missed the error limit at 0.173, so 60 views is the smallest budget that meets both requirements.</p>
+        <div class="shot-grid" style="grid-template-columns:1fr;">
+          <figure class="shot">
+            <img src="assets/images/ee66/lab5/mri-design.jpg" alt="Four panels: a full brain MRI, a k-space mask with a central disk and spiral rings, a blurry center-only reconstruction, and the sharper compressed-sensing reconstruction" loading="lazy" />
+            <figcaption>Brain MRI at a quarter of the scan time. Sampling only the center of k-space blurs the image; the disk-plus-spiral mask with BPD recovers sharper edges from the same 25% budget.</figcaption>
+          </figure>
+          <figure class="shot">
+            <img src="assets/images/ee66/lab5/ct-views.jpg" alt="Five CT reconstructions of a phantom using 24, 36, 45, 60 and 90 views, with streak artifacts fading as views increase" loading="lazy" />
+            <figcaption>CT with fewer X-ray angles. Streaks fade as views increase; 60 views is the first to pass both the error and dose limits.</figcaption>
+          </figure>
+        </div>
+
+      <h2>What I learned</h2>
+      <ul>
+          <li><strong>The Fourier transform isn't just analysis, it's the measurement.</strong> In MRI the scanner literally collects Fourier coefficients, so every scanning decision is a decision about which frequencies to keep.</li>
+          <li><strong>Where you sample matters as much as how much.</strong> The same 25% budget gives ghosts, blur, or a usable image depending on the pattern. Spreading samples incoherently turns structured artifacts into noise that can be cleaned up.</li>
+          <li><strong>Sparsity is a powerful prior.</strong> Knowing that images are simple in a wavelet basis lets an optimizer fill in data that was never measured.</li>
+          <li><strong>Engineering means turning requirements into numbers.</strong> "Good enough at low dose" only became a decision once I set an explicit error limit and dose cap.</li>
+        </ul>
+
+      <div class="note-box">
+        Lab starter materials are from the <a href="https://eecs66.org/" target="_blank" rel="noopener">EE 66 course staff</a>. The implementation and write-up are my own; the notebook code is kept private in line with course academic-integrity policy.
+      </div>
+
+      <nav class="lab-pager"><a href="ee66-lab4-image-deconvolution.html">&larr; Lab 4: Image Deconvolution</a><span></span></nav>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p>Troy &mdash; UC Berkeley &rsquo;27</p>
+    <div class="footer-links">
+      <a href="mailto:troyluanpham@gmail.com" class="social-icon social-icon--sm" aria-label="Email" title="Email"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></a>
+      <a href="https://www.linkedin.com/in/troy-pham" target="_blank" rel="noopener" class="social-icon social-icon--sm" aria-label="LinkedIn" title="LinkedIn"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg></a>
+      <a href="https://github.com/tpshadow11" target="_blank" rel="noopener" class="social-icon social-icon--sm" aria-label="GitHub" title="GitHub"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg></a>
+      <a href="https://www.youtube.com/@troyphammusic" target="_blank" rel="noopener" class="social-icon social-icon--sm" aria-label="YouTube" title="YouTube"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z"/><polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"/></svg></a>
+      <a href="https://www.instagram.com/troypham2005/" target="_blank" rel="noopener" class="social-icon social-icon--sm" aria-label="Instagram" title="Instagram"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg></a>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+</body>
+</html>
