@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CS 188 Project 1: Search — Troy</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;700&amp;family=Inter:wght@400..800&amp;display=swap" rel="stylesheet" />
+</head>
+<body>
+  <nav class="navbar">
+    <a href="index.html" class="nav-logo" aria-label="Home"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11.5 12 4l9 7.5" /><path d="M5.5 10v9a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-9" /><path d="M9.5 20v-6h5v6" /></svg></a>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="about.html">About</a></li>
+      <li><a href="projects.html" class="active">Projects</a></li>
+      <li><a href="journals.html">Journals</a></li>
+      <li><a href="resume.html">Resume</a></li>
+      <li><a href="contact.html">Contact</a></li>
+    </ul>
+  </nav>
+
+  <main>
+    <section class="hero hero--short">
+      <div class="hero-text">
+        <a href="cs188-projects.html" class="back-link">&larr; Back to CS 188 Projects</a>
+        <div class="hero-tag">CS 188 | Project 1 | Summer 2026</div>
+        <h1 class="hero-title">Teaching Pacman<br /><span class="accent">to Plan.</span></h1>
+        <p class="hero-sub">General-purpose graph search for Pacman: DFS, BFS, uniform-cost and A*, then harder problems (visit all four corners, eat every dot) that need a custom state representation and admissible heuristics. My A* heuristics find the same optimal paths while expanding up to 75% fewer nodes.</p>
+        <p class="headline-result"><b>Headline</b>Optimal paths with 75% fewer nodes on the eat-all-food problem &middot; autograder 25/25 plus the bonus point for the food heuristic</p>
+        <div class="project-meta">
+          <span class="tech-pill">Python</span>
+          <span class="tech-pill">Graph Search</span>
+          <span class="tech-pill">A*</span>
+          <span class="tech-pill">Admissible Heuristics</span>
+          <span class="tech-pill">State Design</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="section project-body">
+      <dl class="at-a-glance">
+        <div><dt>Course</dt><dd>CS 188, Introduction to Artificial Intelligence</dd></div>
+        <div><dt>Project</dt><dd>Project 1: Search</dd></div>
+        <div><dt>Timeline</dt><dd>Summer 2026, UC Berkeley</dd></div>
+        <div><dt>Topics</dt><dd>DFS, BFS, UCS, A*, heuristics</dd></div>
+      </dl>
+
+      <div class="stat-row"><div class="stat"><span class="stat-num">25/25</span><span class="stat-label">autograder score, plus 1 bonus point</span></div><div class="stat"><span class="stat-num">&minus;75%</span><span class="stat-label">nodes expanded on eat-all-food (16,688 &rarr; 4,137)</span></div><div class="stat"><span class="stat-num">&minus;42%</span><span class="stat-label">nodes expanded on four-corners (1,966 &rarr; 1,136)</span></div><div class="stat"><span class="stat-num">210</span><span class="stat-label">step optimal path through the big maze</span></div></div>
+
+      <h2>Overview</h2>
+      <p>Pacman has to find his way through a maze, then solve two harder versions: touch all four corners, and eat every food dot. All of them are framed as search problems (states, actions, costs, goal test), so one set of search algorithms solves every layout. The challenge is making search fast enough without giving up the shortest path.</p>
+
+      <h2>Approach</h2>
+        <ul>
+          <li><strong>One generic graph search.</strong> DFS, BFS, uniform-cost search and A* share the same loop and a closed set that prevents re-expanding states. Only the frontier changes: a stack, a queue, or a priority queue ordered by path cost, or by cost plus heuristic for A*.</li>
+          <li><strong>Design the state for the corners problem.</strong> A state is Pacman&rsquo;s position plus which corners have been visited. That is just enough information to know when the goal is reached, and no more, which keeps the state space small.</li>
+          <li><strong>Corners heuristic.</strong> The Manhattan distance to the farthest unvisited corner. Pacman has to get there eventually, and walls only make the trip longer, so it never overestimates (admissible) and stays consistent.</li>
+          <li><strong>Food heuristic.</strong> The true maze distance to the farthest remaining dot. It is still a lower bound on the remaining cost, but much tighter than straight-line distance because it accounts for walls.</li>
+          <li><strong>Fast, near-optimal fallback.</strong> For huge boards, a greedy agent repeatedly runs BFS to the closest dot. It gives up guaranteed optimality to finish instantly.</li>
+        </ul>
+        <div class="formula-block">
+          A*: &nbsp;expand the node with the smallest f(n) = g(n) + h(n)<br />Admissible: &nbsp;h(n) &le; h*(n) &nbsp;&nbsp;&nbsp; Consistent: &nbsp;h(n) &le; c(n, n&prime;) + h(n&prime;)
+          <div class="muted-line" style="margin-top:0.75rem;">g(n) is the cost so far, h(n) the heuristic estimate of the remaining cost, h*(n) the true remaining cost. An admissible, consistent heuristic keeps A* optimal with a closed set.</div>
+        </div>
+
+      <h2>Results</h2>
+        <div class="spec-table-wrap">
+          <table class="spec-table">
+            <thead><tr><th>Problem</th><th>Uninformed</th><th>A* with my heuristic</th><th>Path cost</th></tr></thead>
+            <tbody>
+              <tr><td>Big maze</td><td>UCS: 620 nodes</td><td>549 nodes (Manhattan distance)</td><td>210 (optimal)</td></tr>
+              <tr><td>Four corners (medium)</td><td>BFS: 1,966 nodes</td><td>1,136 nodes</td><td>106 (optimal)</td></tr>
+              <tr><td>Eat all food (tricky)</td><td>UCS: 16,688 nodes</td><td>4,137 nodes</td><td>60 (optimal)</td></tr>
+              <tr><td>Eat all food (big board)</td><td>&mdash;</td><td>Greedy closest-dot</td><td>350 (fast, not optimal)</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>The food heuristic expanded 4,137 nodes, under the 7,000-node bonus threshold, for a final autograder score of 26/25.</p>
+        <div class="shot-grid" style="grid-template-columns:minmax(0, 560px);">
+          <figure class="shot">
+            <img src="assets/images/cs188/p1/astar-maze.png" alt="Big Pacman maze with the A* path drawn in red and expanded cells shaded peach" loading="lazy" />
+            <figcaption>A* with the Manhattan heuristic on the big maze. Shaded cells are the states it expanded; the red line is the optimal 210-step path from Pacman (yellow) to the goal (black).</figcaption>
+          </figure>
+        </div>
+        <div class="shot-grid" style="grid-template-columns:minmax(0, 640px);">
+          <figure class="shot">
+            <img src="assets/images/cs188/p1/nodes-expanded.png" alt="Bar chart comparing nodes expanded by uninformed search and A* on three problems" loading="lazy" />
+            <figcaption>Nodes expanded, log scale. Every pair finds a path of the same optimal cost; the heuristic only changes how much work it takes.</figcaption>
+          </figure>
+        </div>
+
+      <h2>What I learned</h2>
+        <ul>
+          <li><strong>The frontier is the algorithm.</strong> DFS, BFS, UCS and A* turned out to be the same code with a different data structure. Seeing that made the trade-offs between them concrete.</li>
+          <li><strong>A good heuristic is a relaxed problem.</strong> Both heuristics come from ignoring part of the problem (walls, or all but the farthest goal). Relaxing less gave a tighter bound and cut the search by three quarters.</li>
+          <li><strong>State design decides the difficulty.</strong> Storing only the visited corners, not the whole path, kept the corners problem small enough to solve optimally.</li>
+          <li><strong>Optimality has a price.</strong> On the biggest boards, a greedy plan that finishes instantly beats an optimal plan that never finishes.</li>
+        </ul>
+
+      <div class="note-box">
+        Project framework and specifications are from the <a href="https://inst.eecs.berkeley.edu/~cs188/su26/" target="_blank" rel="noopener">CS 188 course staff</a> (the Berkeley Pacman AI projects). The implementation and write-up are my own; the code is kept private in line with course academic-integrity policy. Results come from re-running my finished code.
+      </div>
+
+      <nav class="lab-pager"><span></span><a href="cs188-p2-multiagent.html">Project 2: Multi-Agent Search &rarr;</a></nav>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p>Troy &mdash; UC Berkeley &rsquo;27</p>
+    <div class="footer-links">
+      <a href="mailto:troyluanpham@gmail.com" class="social-icon social-icon--sm" aria-label="Email" title="Email"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></a>
+      <a href="https://www.linkedin.com/in/troy-pham" target="_blank" rel="noopener" class="social-icon social-icon--sm" aria-label="LinkedIn" title="LinkedIn"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg></a>
+      <a href="https://github.com/tpshadow11" target="_blank" rel="noopener" class="social-icon social-icon--sm" aria-label="GitHub" title="GitHub"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg></a>
+      <a href="https://www.youtube.com/@troyphammusic" target="_blank" rel="noopener" class="social-icon social-icon--sm" aria-label="YouTube" title="YouTube"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z"/><polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"/></svg></a>
+      <a href="https://www.instagram.com/troypham2005/" target="_blank" rel="noopener" class="social-icon social-icon--sm" aria-label="Instagram" title="Instagram"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg></a>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+</body>
+</html>

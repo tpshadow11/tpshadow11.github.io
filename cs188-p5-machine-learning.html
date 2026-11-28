@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CS 188 Project 5: Machine Learning — Troy</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;700&amp;family=Inter:wght@400..800&amp;display=swap" rel="stylesheet" />
+</head>
+<body>
+  <nav class="navbar">
+    <a href="index.html" class="nav-logo" aria-label="Home"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11.5 12 4l9 7.5" /><path d="M5.5 10v9a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-9" /><path d="M9.5 20v-6h5v6" /></svg></a>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="about.html">About</a></li>
+      <li><a href="projects.html" class="active">Projects</a></li>
+      <li><a href="journals.html">Journals</a></li>
+      <li><a href="resume.html">Resume</a></li>
+      <li><a href="contact.html">Contact</a></li>
+    </ul>
+  </nav>
+
+  <main>
+    <section class="hero hero--short">
+      <div class="hero-text">
+        <a href="cs188-projects.html" class="back-link">&larr; Back to CS 188 Projects</a>
+        <div class="hero-tag">CS 188 | Project 5 | Summer 2026</div>
+        <h1 class="hero-title">Neural Networks<br /><span class="accent">from Scratch.</span></h1>
+        <p class="hero-sub">A perceptron, a regression network, an MNIST digit classifier and a recurrent language identifier, all built on a minimal autodiff library rather than PyTorch. The digit classifier reaches 97.5% test accuracy and the RNN names a word&rsquo;s language from five options 85.6% of the time.</p>
+        <p class="headline-result"><b>Headline</b>97.5% test accuracy on MNIST &middot; 85.6% language ID from a single word &middot; no deep learning framework</p>
+        <div class="project-meta">
+          <span class="tech-pill">Python</span>
+          <span class="tech-pill">NumPy</span>
+          <span class="tech-pill">Neural Networks</span>
+          <span class="tech-pill">SGD</span>
+          <span class="tech-pill">RNNs</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="section project-body">
+      <dl class="at-a-glance">
+        <div><dt>Course</dt><dd>CS 188, Introduction to Artificial Intelligence</dd></div>
+        <div><dt>Project</dt><dd>Project 5: Machine Learning</dd></div>
+        <div><dt>Timeline</dt><dd>Summer 2026, UC Berkeley</dd></div>
+        <div><dt>Topics</dt><dd>Perceptron, MLPs, SGD, recurrent networks</dd></div>
+      </dl>
+
+      <div class="stat-row"><div class="stat"><span class="stat-num">25/25</span><span class="stat-label">autograder score</span></div><div class="stat"><span class="stat-num">97.5%</span><span class="stat-label">MNIST test accuracy with one hidden layer</span></div><div class="stat"><span class="stat-num">85.6%</span><span class="stat-label">language ID accuracy across 5 languages</span></div><div class="stat"><span class="stat-num">0.019</span><span class="stat-label">final mean squared error fitting sin(x)</span></div></div>
+
+      <h2>Overview</h2>
+      <p>Four learning problems of increasing difficulty: separate two classes with a line, fit a smooth curve, recognize handwritten digits, and guess which language a word comes from. Each model is built from primitive operations (matrix multiply, bias, ReLU, loss) on a small autodiff library, so every layer and training loop is written by hand.</p>
+
+      <h2>Approach</h2>
+        <ul>
+          <li><strong>Perceptron.</strong> A linear classifier trained with mistake-driven updates: whenever it misclassifies a point, add or subtract that point from the weights, until a full pass has no mistakes.</li>
+          <li><strong>Regression.</strong> A network with one 200-unit ReLU hidden layer fit to sin(x) on [&minus;2&pi;, 2&pi;] with squared loss and stochastic gradient descent, stopping once the loss drops below 0.02.</li>
+          <li><strong>Digit classification.</strong> A 784 &rarr; 200 &rarr; 10 network with ReLU and softmax cross-entropy loss, trained with SGD (learning rate 0.01) until validation accuracy passes 97.5%.</li>
+          <li><strong>Language identification.</strong> A recurrent network that reads a word one character at a time, updating a 200-unit hidden state with shared weights, then maps the final state to scores for English, Spanish, Finnish, Dutch and Polish. Sharing weights lets one model handle words of any length.</li>
+        </ul>
+        <div class="formula-block">
+          Hidden layer: &nbsp;h = ReLU(xW<sub>1</sub> + b<sub>1</sub>), &nbsp;&nbsp; scores = hW<sub>2</sub> + b<sub>2</sub><br />RNN: &nbsp;h<sub>i</sub> = ReLU(x<sub>i</sub>W<sub>x</sub> + b + h<sub>i&minus;1</sub>W<sub>h</sub>) &nbsp;&nbsp;&nbsp; SGD: &nbsp;&theta; &larr; &theta; &minus; &eta; &nabla;<sub>&theta;</sub>L
+          <div class="muted-line" style="margin-top:0.75rem;">x<sub>i</sub> is the one-hot vector for character i, W<sub>h</sub> the shared hidden-to-hidden weights, &eta; the learning rate, L the loss.</div>
+        </div>
+
+      <h2>Results</h2>
+        <div class="spec-table-wrap">
+          <table class="spec-table">
+            <thead><tr><th>Model</th><th>Result</th></tr></thead>
+            <tbody>
+              <tr><td>Perceptron</td><td>Converges to a separating line</td></tr>
+              <tr><td>Regression on sin(x)</td><td>Final mean squared error 0.019 (target &lt; 0.02)</td></tr>
+              <tr><td>MNIST digit classifier</td><td>97.5% test accuracy</td></tr>
+              <tr><td>Language ID (RNN)</td><td>85.6% test accuracy; per language: Finnish 94%, Spanish 91%, Polish 88%, Dutch 82%, English 73%</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="shot-grid" style="grid-template-columns:minmax(0, 900px);">
+          <figure class="shot">
+            <img src="assets/images/cs188/p5/digits.png" alt="Sixteen handwritten digits with the predicted label above each; the last four are misclassified" loading="lazy" />
+            <figcaption>Held-out digits with the network&rsquo;s predictions. The last four (red) are mistakes; some are hard to read even for a person, like a 4 written close to a 9.</figcaption>
+          </figure>
+        </div>
+        <div class="shot-grid" style="grid-template-columns:minmax(0, 520px);">
+          <figure class="shot">
+            <img src="assets/images/cs188/p5/language-confusion.png" alt="Five by five confusion matrix of true versus predicted language" loading="lazy" />
+            <figcaption>Language ID confusion matrix (test set). Finnish and Spanish are the most distinctive; English is hardest, most often mistaken for Spanish (14%), and Dutch is most often mistaken for English (9%).</figcaption>
+          </figure>
+        </div>
+
+      <h2>What I learned</h2>
+        <ul>
+          <li><strong>Frameworks hide a simple loop.</strong> Forward pass, loss, gradients, update: writing it by hand made it clear what PyTorch does under the hood.</li>
+          <li><strong>One hidden layer goes a long way.</strong> A single 200-unit ReLU layer was enough for 97.5% on handwritten digits.</li>
+          <li><strong>Weight sharing handles variable length.</strong> Reusing the same weights at every character is what lets an RNN read words of any length with a fixed number of parameters.</li>
+          <li><strong>Averages hide the spread.</strong> An 85.6% overall accuracy covers a range from 73% on English to 94% on Finnish, so the per-language breakdown says more than the single number.</li>
+        </ul>
+
+      <div class="note-box">
+        Project framework and specifications are from the <a href="https://inst.eecs.berkeley.edu/~cs188/su26/" target="_blank" rel="noopener">CS 188 course staff</a> (the Berkeley Pacman AI projects). The implementation and write-up are my own; the code is kept private in line with course academic-integrity policy. Results come from re-running my finished code.
+      </div>
+
+      <nav class="lab-pager"><a href="cs188-p4-ghostbusters.html">&larr; Project 4: Ghostbusters</a><span></span></nav>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p>Troy &mdash; UC Berkeley &rsquo;27</p>
+    <div class="footer-links">
+      <a href="mailto:troyluanpham@gmail.com" class="social-icon social-icon--sm" aria-label="Email" title="Email"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></a>
+      <a href="https://www.linkedin.com/in/troy-pham" target="_blank" rel="noopener" class="social-icon social-icon--sm" aria-label="LinkedIn" title="LinkedIn"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg></a>
+      <a href="https://github.com/tpshadow11" target="_blank" rel="noopener" class="social-icon social-icon--sm" aria-label="GitHub" title="GitHub"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg></a>
+      <a href="https://www.youtube.com/@troyphammusic" target="_blank" rel="noopener" class="social-icon social-icon--sm" aria-label="YouTube" title="YouTube"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z"/><polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"/></svg></a>
+      <a href="https://www.instagram.com/troypham2005/" target="_blank" rel="noopener" class="social-icon social-icon--sm" aria-label="Instagram" title="Instagram"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg></a>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+</body>
+</html>

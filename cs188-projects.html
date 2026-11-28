@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CS 188 Projects — Troy</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;700&amp;family=Inter:wght@400..800&amp;display=swap" rel="stylesheet" />
+</head>
+<body>
+  <nav class="navbar">
+    <a href="index.html" class="nav-logo" aria-label="Home"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11.5 12 4l9 7.5" /><path d="M5.5 10v9a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-9" /><path d="M9.5 20v-6h5v6" /></svg></a>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="about.html">About</a></li>
+      <li><a href="projects.html" class="active">Projects</a></li>
+      <li><a href="journals.html">Journals</a></li>
+      <li><a href="resume.html">Resume</a></li>
+      <li><a href="contact.html">Contact</a></li>
+    </ul>
+  </nav>
+
+  <main>
+    <section class="hero hero--short">
+      <div class="hero-text">
+        <a href="projects.html" class="back-link">&larr; Back to Projects</a>
+        <div class="hero-tag">CS 188 | UC Berkeley | Summer 2026</div>
+        <h1 class="hero-title">Artificial<br /><span class="accent">Intelligence.</span></h1>
+        <p class="hero-sub">Five projects from CS 188 (Introduction to Artificial Intelligence) that build the core ideas of AI into Pacman agents: search, adversarial game play, reinforcement learning, probabilistic tracking, and neural networks written from scratch.</p>
+        <p class="headline-result"><b>Headline</b>A* with 75% fewer nodes &middot; 10/10 wins vs. ghosts &middot; RL agent wins after 50 games &middot; 97.5% on MNIST without a framework</p>
+        <div class="project-meta">
+          <span class="tech-pill">Python</span>
+          <span class="tech-pill">Search &amp; A*</span>
+          <span class="tech-pill">Minimax / Expectimax</span>
+          <span class="tech-pill">MDPs &amp; Q-Learning</span>
+          <span class="tech-pill">Bayes Nets &amp; HMMs</span>
+          <span class="tech-pill">Neural Networks</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="journal-intro">
+        <p class="lead">Five projects from CS 188 at UC Berkeley, each an AI technique built into a working agent and measured.</p>
+        <p>Each write-up covers the problem, my approach, results and figures from re-running my finished code, and what I took away. The code is kept private in line with course academic-integrity policy.</p>
+      </div>
+
+      <h2 class="section-label">Project Logs</h2>
+
+      <article class="journal-entry">
+        <div class="journal-when">
+          <strong>Project 1</strong>
+          Summer 2026<br />DFS
+        </div>
+        <div>
+          <div class="card-tag ai">AI | Search</div>
+          <h3><a href="cs188-p1-search.html">Search: Pathfinding in Pacman</a></h3>
+          <p>General-purpose graph search for Pacman: DFS, BFS, uniform-cost and A*, then harder problems (visit all four corners, eat every dot) that need a custom state representation and admissible heuristics. My A* heuristics find the same optimal paths while expanding up to 75% fewer nodes.</p>
+          <div class="card-footer">
+            <span class="tech-pill">Graph Search</span>
+            <span class="tech-pill">A*</span>
+            <span class="tech-pill">Admissible Heuristics</span>
+            <a href="cs188-p1-search.html" class="card-link">Read write-up &rarr;</a>
+          </div>
+        </div>
+      </article>
+
+      <article class="journal-entry">
+        <div class="journal-when">
+          <strong>Project 2</strong>
+          Summer 2026<br />Minimax
+        </div>
+        <div>
+          <div class="card-tag ai">AI | Game Playing</div>
+          <h3><a href="cs188-p2-multiagent.html">Multi-Agent Search: Pacman vs. Ghosts</a></h3>
+          <p>Adversarial search for Pacman against one or more ghosts: a reflex agent, depth-limited minimax, alpha-beta pruning and expectimax, plus a hand-designed evaluation function. Alpha-beta picks the same move as minimax while generating 88% fewer game states.</p>
+          <div class="card-footer">
+            <span class="tech-pill">Minimax</span>
+            <span class="tech-pill">Alpha-Beta Pruning</span>
+            <span class="tech-pill">Expectimax</span>
+            <a href="cs188-p2-multiagent.html" class="card-link">Read write-up &rarr;</a>
+          </div>
+        </div>
+      </article>
+
+      <article class="journal-entry">
+        <div class="journal-when">
+          <strong>Project 3</strong>
+          Summer 2026<br />MDPs
+        </div>
+        <div>
+          <div class="card-tag ai">AI | Reinforcement Learning</div>
+          <h3><a href="cs188-p3-reinforcement.html">Reinforcement Learning: MDPs and Q-Learning</a></h3>
+          <p>Solving Markov decision processes with value iteration when the model is known, then learning without a model through Q-learning. Approximate Q-learning with a few features wins every test game on a full-size board after only 50 training games.</p>
+          <div class="card-footer">
+            <span class="tech-pill">MDPs</span>
+            <span class="tech-pill">Value Iteration</span>
+            <span class="tech-pill">Q-Learning</span>
+            <a href="cs188-p3-reinforcement.html" class="card-link">Read write-up &rarr;</a>
+          </div>
+        </div>
+      </article>
+
+      <article class="journal-entry">
+        <div class="journal-when">
+          <strong>Project 4</strong>
+          Summer 2026<br />Bayes nets
+        </div>
+        <div>
+          <div class="card-tag ai">AI | Probabilistic Inference</div>
+          <h3><a href="cs188-p4-ghostbusters.html">Ghostbusters: Probabilistic Tracking</a></h3>
+          <p>Pacman hunts ghosts he cannot see, using only noisy distance readings. I implemented Bayes net inference with variable elimination, exact HMM tracking with the forward algorithm, and a particle filter; a greedy hunter using these beliefs wins every test game.</p>
+          <div class="card-footer">
+            <span class="tech-pill">Bayes Nets</span>
+            <span class="tech-pill">Variable Elimination</span>
+            <span class="tech-pill">Hidden Markov Models</span>
+            <a href="cs188-p4-ghostbusters.html" class="card-link">Read write-up &rarr;</a>
+          </div>
+        </div>
+      </article>
+
+      <article class="journal-entry">
+        <div class="journal-when">
+          <strong>Project 5</strong>
+          Summer 2026<br />Perceptron
+        </div>
+        <div>
+          <div class="card-tag ds">Machine Learning</div>
+          <h3><a href="cs188-p5-machine-learning.html">Machine Learning: Neural Nets from Scratch</a></h3>
+          <p>A perceptron, a regression network, an MNIST digit classifier and a recurrent language identifier, all built on a minimal autodiff library rather than PyTorch. The digit classifier reaches 97.5% test accuracy and the RNN names a word&rsquo;s language from five options 85.6% of the time.</p>
+          <div class="card-footer">
+            <span class="tech-pill">NumPy</span>
+            <span class="tech-pill">Neural Networks</span>
+            <span class="tech-pill">SGD</span>
+            <a href="cs188-p5-machine-learning.html" class="card-link">Read write-up &rarr;</a>
+          </div>
+        </div>
+      </article>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p>Troy &mdash; UC Berkeley &rsquo;27</p>
+    <div class="footer-links">
+      <a href="mailto:troyluanpham@gmail.com" class="social-icon social-icon--sm" aria-label="Email" title="Email"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></a>
+      <a href="https://www.linkedin.com/in/troy-pham" target="_blank" rel="noopener" class="social-icon social-icon--sm" aria-label="LinkedIn" title="LinkedIn"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg></a>
+      <a href="https://github.com/tpshadow11" target="_blank" rel="noopener" class="social-icon social-icon--sm" aria-label="GitHub" title="GitHub"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg></a>
+      <a href="https://www.youtube.com/@troyphammusic" target="_blank" rel="noopener" class="social-icon social-icon--sm" aria-label="YouTube" title="YouTube"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z"/><polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"/></svg></a>
+      <a href="https://www.instagram.com/troypham2005/" target="_blank" rel="noopener" class="social-icon social-icon--sm" aria-label="Instagram" title="Instagram"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg></a>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CS 188 Project 3: Reinforcement Learning — Troy</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;700&amp;family=Inter:wght@400..800&amp;display=swap" rel="stylesheet" />
+</head>
+<body>
+  <nav class="navbar">
+    <a href="index.html" class="nav-logo" aria-label="Home"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11.5 12 4l9 7.5" /><path d="M5.5 10v9a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-9" /><path d="M9.5 20v-6h5v6" /></svg></a>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="about.html">About</a></li>
+      <li><a href="projects.html" class="active">Projects</a></li>
+      <li><a href="journals.html">Journals</a></li>
+      <li><a href="resume.html">Resume</a></li>
+      <li><a href="contact.html">Contact</a></li>
+    </ul>
+  </nav>
+
+  <main>
+    <section class="hero hero--short">
+      <div class="hero-text">
+        <a href="cs188-projects.html" class="back-link">&larr; Back to CS 188 Projects</a>
+        <div class="hero-tag">CS 188 | Project 3 | Summer 2026</div>
+        <h1 class="hero-title">Learning from<br /><span class="accent">Rewards.</span></h1>
+        <p class="hero-sub">Solving Markov decision processes with value iteration when the model is known, then learning without a model through Q-learning. Approximate Q-learning with a few features wins every test game on a full-size board after only 50 training games.</p>
+        <p class="headline-result"><b>Headline</b>Approximate Q-learning: 10/10 wins on the medium board after 50 training games &middot; tabular Q-learning from &minus;511 to +269 average reward</p>
+        <div class="project-meta">
+          <span class="tech-pill">Python</span>
+          <span class="tech-pill">MDPs</span>
+          <span class="tech-pill">Value Iteration</span>
+          <span class="tech-pill">Q-Learning</span>
+          <span class="tech-pill">Feature-Based RL</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="section project-body">
+      <dl class="at-a-glance">
+        <div><dt>Course</dt><dd>CS 188, Introduction to Artificial Intelligence</dd></div>
+        <div><dt>Project</dt><dd>Project 3: Reinforcement Learning</dd></div>
+        <div><dt>Timeline</dt><dd>Summer 2026, UC Berkeley</dd></div>
+        <div><dt>Topics</dt><dd>MDPs, value iteration, Q-learning, function approximation</dd></div>
+      </dl>
+
+      <div class="stat-row"><div class="stat"><span class="stat-num">25/25</span><span class="stat-label">autograder score, plus 1 bonus point</span></div><div class="stat"><span class="stat-num">10/10</span><span class="stat-label">wins on the medium board with approximate Q-learning</span></div><div class="stat"><span class="stat-num">50</span><span class="stat-label">training games needed with features</span></div><div class="stat"><span class="stat-num">+780</span><span class="stat-label">gain in average reward over tabular Q-learning training</span></div></div>
+
+      <h2>Overview</h2>
+      <p>An agent has to act well in a world with uncertain outcomes. When the transition model and rewards are known (a gridworld), the optimal policy can be computed directly. When they are not (Pacman, a crawling robot), the agent has to learn from trial and error. The project goes from planning to learning to generalizing.</p>
+
+      <h2>Approach</h2>
+        <ul>
+          <li><strong>Value iteration.</strong> Repeated Bellman updates over every state until the values settle, then a policy that picks the action with the best expected value. I also implemented prioritized sweeping, which updates the states whose values are most out of date first (the bonus point).</li>
+          <li><strong>Q-learning.</strong> Learns action values directly from experience, with no model, using a temporal-difference update after every step.</li>
+          <li><strong>Exploration.</strong> &epsilon;-greedy action selection: mostly take the best-known action, but sometimes act randomly so the agent keeps discovering better options.</li>
+          <li><strong>Approximate Q-learning.</strong> Instead of a table entry per state, Q is a weighted sum of features (bias, ghosts one step away, whether a move eats food, distance to the closest food). The weights are learned with the same TD error, so experience in one state transfers to similar states.</li>
+        </ul>
+        <div class="formula-block">
+          Value iteration: &nbsp;V<sub>k+1</sub>(s) = max<sub>a</sub> &Sigma;<sub>s&prime;</sub> T(s, a, s&prime;) [R(s, a, s&prime;) + &gamma; V<sub>k</sub>(s&prime;)]<br />Q-learning: &nbsp;Q(s, a) &larr; (1 &minus; &alpha;) Q(s, a) + &alpha; [r + &gamma; max<sub>a&prime;</sub> Q(s&prime;, a&prime;)]<br />Approximate: &nbsp;Q(s, a) = &Sigma;<sub>i</sub> w<sub>i</sub> f<sub>i</sub>(s, a), &nbsp;&nbsp; w<sub>i</sub> &larr; w<sub>i</sub> + &alpha; &middot; &delta; &middot; f<sub>i</sub>(s, a)
+          <div class="muted-line" style="margin-top:0.75rem;">&gamma; is the discount, &alpha; the learning rate, &delta; = r + &gamma; max Q(s&prime;, a&prime;) &minus; Q(s, a) the temporal-difference error.</div>
+        </div>
+
+      <h2>Results</h2>
+        <div class="spec-table-wrap">
+          <table class="spec-table">
+            <thead><tr><th>Experiment</th><th>Result</th></tr></thead>
+            <tbody>
+              <tr><td>Value iteration, book gridworld (100 iterations)</td><td>Start-state value 0.49; policy routes around the &minus;1 exit</td></tr>
+              <tr><td>Tabular Q-learning Pacman, small grid (2,000 training games)</td><td>Average reward &minus;511 &rarr; +269; 10/10 test wins</td></tr>
+              <tr><td>Approximate Q-learning, medium board (50 training games)</td><td>10/10 test wins, average score 1,323</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="shot-grid" style="grid-template-columns:minmax(0, 560px);">
+          <figure class="shot">
+            <img src="assets/images/cs188/p3/value-iteration.png" alt="Gridworld with each cell colored by its computed value and an arrow for the best action" loading="lazy" />
+            <figcaption>Value iteration on the book gridworld. Each cell shows its value and best action; the policy heads for the +1 exit while steering clear of the &minus;1 cell.</figcaption>
+          </figure>
+        </div>
+        <div class="shot-grid" style="grid-template-columns:minmax(0, 640px);">
+          <figure class="shot">
+            <img src="assets/images/cs188/p3/q-learning-curve.png" alt="Line chart of average reward per 100 training episodes rising from about minus 500 to about plus 270" loading="lazy" />
+            <figcaption>Tabular Q-learning on the small grid. Early games are mostly random exploration and losses; reward turns positive after about 1,000 episodes as the Q-values converge.</figcaption>
+          </figure>
+        </div>
+
+      <h2>What I learned</h2>
+        <ul>
+          <li><strong>Planning and learning use the same equation.</strong> Q-learning is the Bellman update with the expectation replaced by samples, which made the jump from MDPs to RL feel natural.</li>
+          <li><strong>Exploration is a real cost.</strong> The learning curve spends its first thousand episodes losing: that is the price of discovering what works.</li>
+          <li><strong>Features are what make RL scale.</strong> A table needed 2,000 games for a tiny grid, while four features were enough to win a full board after 50 games, because what the agent learned in one state applied everywhere similar.</li>
+        </ul>
+
+      <div class="note-box">
+        Project framework and specifications are from the <a href="https://inst.eecs.berkeley.edu/~cs188/su26/" target="_blank" rel="noopener">CS 188 course staff</a> (the Berkeley Pacman AI projects). The implementation and write-up are my own; the code is kept private in line with course academic-integrity policy. Results come from re-running my finished code.
+      </div>
+
+      <nav class="lab-pager"><a href="cs188-p2-multiagent.html">&larr; Project 2: Multi-Agent Search</a><a href="cs188-p4-ghostbusters.html">Project 4: Ghostbusters &rarr;</a></nav>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p>Troy &mdash; UC Berkeley &rsquo;27</p>
+    <div class="footer-links">
+      <a href="mailto:troyluanpham@gmail.com" class="social-icon social-icon--sm" aria-label="Email" title="Email"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></a>
+      <a href="https://www.linkedin.com/in/troy-pham" target="_blank" rel="noopener" class="social-icon social-icon--sm" aria-label="LinkedIn" title="LinkedIn"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg></a>
+      <a href="https://github.com/tpshadow11" target="_blank" rel="noopener" class="social-icon social-icon--sm" aria-label="GitHub" title="GitHub"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg></a>
+      <a href="https://www.youtube.com/@troyphammusic" target="_blank" rel="noopener" class="social-icon social-icon--sm" aria-label="YouTube" title="YouTube"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z"/><polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"/></svg></a>
+      <a href="https://www.instagram.com/troypham2005/" target="_blank" rel="noopener" class="social-icon social-icon--sm" aria-label="Instagram" title="Instagram"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg></a>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+</body>
+</html>
